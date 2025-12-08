@@ -56,29 +56,32 @@ class _SensorThresholdState extends State<SensorThreshold> {
                 DataUpdateCard(
                   entities: sensorValues,
                   label: "Sensor Values:",
-                  lastUpdated: "2 days",
+                  lastUpdated: "2 Days",
                   onValueChanged: (index, newValue) {
                     setState(() {
                       sensorValues[index]['value'] = newValue;
                     });
                   },
-                  onReset: () {
+                  onReset: ()  async {
                     setState(() {
                       sensorValues = [
                         {
                           'label': 'Shoulder Right (F1)',
-                          'value': 60,
+                          'value': 0,
                           'unit': 'N',
                         },
                         {
                           'label': 'Shoulder Left  (F2)',
-                          'value': 60,
+                          'value': 0,
                           'unit': 'N',
                         },
-                        {'label': 'Abdomen (F3)', 'value': 60, 'unit': 'N'},
-                        {'label': 'Back (F4)', 'value': 60, 'unit': 'N'},
+                        {'label': 'Abdomen (F3)', 'value': 0, 'unit': 'N'},
+                        {'label': 'Back (F4)', 'value': 0, 'unit': 'N'},
                       ];
                     });
+                    await context.read<ThresholdProvider>().saveSensors(
+                      sensorValues,
+                    );
                   },
                   onSave: () async {
                     await context.read<ThresholdProvider>().saveSensors(
@@ -99,12 +102,15 @@ class _SensorThresholdState extends State<SensorThreshold> {
                       angleValue[index]['value'] = newValue;
                     });
                   },
-                  onReset: () {
+                  onReset: () async {
                     setState(() {
                       angleValue = [
-                        {'label': 'Tilt Angle', 'value': 60, 'unit': 'Deg'},
+                        {'label': 'Tilt Angle', 'value': 0, 'unit': 'Deg'},
                       ];
                     });
+                    await context.read<ThresholdProvider>().saveAngle(
+                      angleValue,
+                    );
                   },
                   onSave: () async {
                     await context.read<ThresholdProvider>().saveAngle(

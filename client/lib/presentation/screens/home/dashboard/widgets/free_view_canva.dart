@@ -11,11 +11,20 @@ import '../../../../../core/theme/colors.dart';
 class FreeViewCanva extends StatefulWidget {
   final bool hasAlert;
   final String alertLevel;
+  // Individual sensor statuses
+  final String f1Status;
+  final String f2Status;
+  final String f3Status;
+  final String f4Status;
 
   const FreeViewCanva({
     super.key,
     this.hasAlert = false,
     this.alertLevel = "safe",
+    this.f1Status = "Safe",
+    this.f2Status = "Safe",
+    this.f3Status = "Safe",
+    this.f4Status = "Safe",
   });
 
   @override
@@ -35,9 +44,12 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
   @override
   void didUpdateWidget(FreeViewCanva oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (oldWidget.alertLevel != widget.alertLevel && _modelLoaded) {
-      _updateModelColor();
+    if (_modelLoaded &&
+        (oldWidget.f1Status != widget.f1Status ||
+            oldWidget.f2Status != widget.f2Status ||
+            oldWidget.f3Status != widget.f3Status ||
+            oldWidget.f4Status != widget.f4Status)) {
+      _updateAllSensorColors();
     }
   }
 
@@ -57,13 +69,11 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
           onWebViewCreated: (c) {
             _controller = c;
             Future.delayed(const Duration(seconds: 2), () {
-              _logMaterials();
               _modelLoaded = true;
-              _updateModelColor();
+              _updateAllSensorColors();
             });
           },
         ),
-
         Positioned(
           bottom: 6,
           left: 10,
@@ -77,7 +87,6 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
             ],
           ),
         ),
-
         Positioned(
           bottom: 6,
           right: 10,
@@ -115,64 +124,52 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
     );
   }
 
-  Future<void> _logMaterials() async {
-    if (_controller == null) return;
-    const js = """
-      (function(){
-        const mv = document.querySelector('model-viewer');
-        if (!mv || !mv.model) return;
-        console.log("⚪ MATERIALS FOUND:", mv.model.materials.length);
-        mv.model.materials.forEach((m,i)=>console.log("•", m.name, "(index", i + ")"));
-      })();
-    """;
-    try {
-      await _controller!.runJavaScript(js);
-    } catch (_) {}
-  }
-
-  Future<void> _updateModelColor() async {
-    Color targetColor;
-
-    switch (widget.alertLevel) {
-      case "safe":
-        targetColor = AppColors.accent;
-        break;
-      case "warning":
-        targetColor = AppColors.warning;
-        break;
+  Color _getColorFromStatus(String status) {
+    switch (status.toLowerCase()) {
       case "alert":
-        targetColor = Colors.red;
-        break;
+        return Colors.red;
+      case "safe":
+        return AppColors.accent;
       default:
-        targetColor = AppColors.warning;
-        break;
+        return AppColors.warning;
     }
-
-    await changePartColor("Default", targetColor);
   }
 
-  Future<void> changePartColor(String materialName, Color color) async {
+  Future<void> _updateAllSensorColors() async {
+    // Update each sensor material individually using their indices
+    // F1 is at index 3, F2 at 4, F3 at 5, F4 at 6
+    await changePartColorByIndex(3, _getColorFromStatus(widget.f1Status));
+    await changePartColorByIndex(4, _getColorFromStatus(widget.f2Status));
+    await changePartColorByIndex(5, _getColorFromStatus(widget.f3Status));
+    await changePartColorByIndex(6, _getColorFromStatus(widget.f4Status));
+  }
+
+  Future<void> changePartColorByIndex(int materialIndex, Color color) async {
     if (_controller == null) return;
 
     final r = color.red / 255;
     final g = color.green / 255;
     final b = color.blue / 255;
 
-    final js =
-        """
+    final js = """
       (function(){
         const mv = document.querySelector('model-viewer');
         if (!mv || !mv.model) return;
-        mv.model.materials.forEach(m => {
-          if (m.name === "$materialName") {
-            m.pbrMetallicRoughness.setBaseColorFactor([$r,$g,$b,1]);
-          }
-        });
+        
+        const material = mv.model.materials[$materialIndex];
+        if (material) {
+          material.pbrMetallicRoughness.setBaseColorFactor([$r,$g,$b,1]);
+          console.log('✅ Updated material at index $materialIndex to RGB($r,$g,$b)');
+        } else {
+          console.log('❌ Material at index $materialIndex not found');
+        }
       })();
     """;
 
     try {
       await _controller!.runJavaScript(js);
-    } catch (_) {}
+    } catch (e) {
+      print('Error updating material $materialIndex: $e');
+    }
   }
 }

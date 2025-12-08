@@ -1,10 +1,6 @@
 import 'dart:ui';
 
 import 'package:client/core/theme/colors.dart';
-import 'package:client/presentation/screens/home/settings/data_logs.dart';
-import 'package:client/presentation/screens/home/settings/over_wear.dart';
-import 'package:client/presentation/screens/home/settings/reset_device.dart';
-import 'package:client/presentation/screens/home/settings/sensor_threshold.dart';
 import 'package:client/presentation/screens/home/settings/settings.dart';
 import 'package:flutter/material.dart';
 
@@ -22,11 +18,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     Dashboard(),
-    Settings(),
-    SensorThreshold(),
-    OverWear(),
-    DataLogs(),
-    ResetDevice(),
+    Settings()
   ];
 
   @override

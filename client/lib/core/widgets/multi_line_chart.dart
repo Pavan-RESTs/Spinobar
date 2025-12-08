@@ -214,7 +214,7 @@ class _MultiLineChartState extends State<MultiLineChart>
                           padding: EdgeInsetsGeometry.all(16),
                           child: Text(
                             value.toInt().toString(),
-                            style: TextStyle(color: Colors.white, fontSize: 10),
+                            style: TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         ),
                       ),

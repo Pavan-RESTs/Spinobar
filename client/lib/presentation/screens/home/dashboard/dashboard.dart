@@ -150,6 +150,11 @@ class Dashboard extends StatelessWidget {
               child: FreeViewCanva(
                 hasAlert: hasAnyAlert(),
                 alertLevel: calculateAlertLevel(),
+                // Pass individual sensor statuses
+                f1Status: statusFromThreshold(telemetry?.f1, thF1),
+                f2Status: statusFromThreshold(telemetry?.f2, thF2),
+                f3Status: statusFromThreshold(telemetry?.f3, thF3),
+                f4Status: statusFromThreshold(telemetry?.f4, thF4),
               ),
             ),
             Transform.translate(

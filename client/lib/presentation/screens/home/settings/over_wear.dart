@@ -53,12 +53,13 @@ class _OverWearState extends State<OverWear> {
                   });
                 },
 
-                onReset: () {
+                onReset: () async {
                   setState(() {
                     entities = [
-                      { 'label': 'Time', 'value': 6, 'unit': 'min' }
+                      { 'label': 'Time', 'value': 0, 'unit': 'min' }
                     ];
                   });
+                  await context.read<ThresholdProvider>().saveTime(entities);
                 },
 
                 onSave: () async {
