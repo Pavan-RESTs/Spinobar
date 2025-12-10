@@ -1,6 +1,3 @@
-
-
-// ==================== NOTIFICATION PAGE ====================
 import 'package:client/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,10 +12,10 @@ class NotificationPage extends StatefulWidget {
   State<NotificationPage> createState() => _NotificationPageState();
 }
 
-class _NotificationPageState extends State<NotificationPage> with SingleTickerProviderStateMixin {
+class _NotificationPageState extends State<NotificationPage>
+    with SingleTickerProviderStateMixin {
   final NotificationService _notificationService = NotificationService();
   late TabController _tabController;
-  NotificationType? _filterType;
 
   @override
   void initState() {
@@ -40,11 +37,9 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    final notifications = _filterType == null
-        ? (_tabController.index == 0
+    final notifications = _tabController.index == 0
         ? _notificationService.notifications
-        : _notificationService.unreadNotifications)
-        : _notificationService.getNotificationsByType(_filterType!);
+        : _notificationService.notifications.where((n) => !n.isRead).toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -53,7 +48,6 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              // Custom App Bar
               Row(
                 children: [
                   GestureDetector(
@@ -82,9 +76,16 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
                           value: 'mark_all_read',
                           child: Row(
                             children: [
-                              Icon(Icons.done_all, color: Colors.white70, size: 20),
+                              Icon(
+                                Icons.done_all,
+                                color: Colors.white70,
+                                size: 20,
+                              ),
                               SizedBox(width: 10),
-                              Text('Mark all read', style: TextStyle(color: Colors.white)),
+                              Text(
+                                'Mark all read',
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ],
                           ),
                         ),
@@ -92,9 +93,16 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
                         value: 'clear_read',
                         child: Row(
                           children: [
-                            Icon(Icons.clear_all, color: Colors.white70, size: 20),
+                            Icon(
+                              Icons.clear_all,
+                              color: Colors.white70,
+                              size: 20,
+                            ),
                             SizedBox(width: 10),
-                            Text('Clear read', style: TextStyle(color: Colors.white)),
+                            Text(
+                              'Clear read',
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ],
                         ),
                       ),
@@ -102,9 +110,16 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
                         value: 'clear_all',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_sweep, color: Colors.red, size: 20),
+                            Icon(
+                              Icons.delete_sweep,
+                              color: Colors.red,
+                              size: 20,
+                            ),
                             SizedBox(width: 10),
-                            Text('Clear all', style: TextStyle(color: Colors.red)),
+                            Text(
+                              'Clear all',
+                              style: TextStyle(color: Colors.red),
+                            ),
                           ],
                         ),
                       ),
@@ -123,7 +138,6 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
               ),
               SizedBox(height: 24),
 
-              // Tab Bar
               Container(
                 padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(
@@ -144,82 +158,37 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
-                  onTap: (_) => setState(() => _filterType = null),
+                  onTap: (_) => setState(() {}),
                   tabs: [
-                    Tab(text: 'All (${_notificationService.notifications.length})'),
+                    Tab(
+                      text:
+                          'All (${_notificationService.notifications.length})',
+                    ),
                     Tab(text: 'Unread (${_notificationService.unreadCount})'),
                   ],
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 20),
 
-              // Filter Chips
-              _buildFilterChips(),
-              SizedBox(height: 16),
-
-              // Notifications List
               Expanded(
                 child: notifications.isEmpty
                     ? _buildEmptyState()
                     : ListView.builder(
-                  itemCount: notifications.length,
-                  itemBuilder: (context, index) {
-                    return _NotificationCard(
-                      notification: notifications[index],
-                      onTap: () => _handleNotificationTap(notifications[index]),
-                      onDelete: () => _notificationService.deleteNotification(
-                        notifications[index].id,
+                        itemCount: notifications.length,
+                        itemBuilder: (context, index) {
+                          return _NotificationCard(
+                            notification: notifications[index],
+                            onTap: () =>
+                                _handleNotificationTap(notifications[index]),
+                            onDelete: () => _notificationService
+                                .deleteNotification(notifications[index].id),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChips() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _FilterChip(
-            label: 'All',
-            isSelected: _filterType == null,
-            onTap: () => setState(() => _filterType = null),
-          ),
-          SizedBox(width: 8),
-          _FilterChip(
-            label: 'Alert',
-            color: Colors.red,
-            isSelected: _filterType == NotificationType.alert,
-            onTap: () => setState(() => _filterType = NotificationType.alert),
-          ),
-          SizedBox(width: 8),
-          _FilterChip(
-            label: 'Warning',
-            color: AppColors.warning,
-            isSelected: _filterType == NotificationType.warning,
-            onTap: () => setState(() => _filterType = NotificationType.warning),
-          ),
-          SizedBox(width: 8),
-          _FilterChip(
-            label: 'Info',
-            color: Colors.blueAccent,
-            isSelected: _filterType == NotificationType.info,
-            onTap: () => setState(() => _filterType = NotificationType.info),
-          ),
-          SizedBox(width: 8),
-          _FilterChip(
-            label: 'Success',
-            color: AppColors.success,
-            isSelected: _filterType == NotificationType.success,
-            onTap: () => setState(() => _filterType = NotificationType.success),
-          ),
-        ],
       ),
     );
   }
@@ -229,11 +198,7 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.notifications_none,
-            size: 80,
-            color: Colors.white30,
-          ),
+          Icon(Icons.notifications_none, size: 80, color: Colors.white30),
           SizedBox(height: 16),
           Text(
             'No notifications',
@@ -246,10 +211,7 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
           SizedBox(height: 8),
           Text(
             'You\'re all caught up!',
-            style: TextStyle(
-              color: Colors.white30,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Colors.white30, fontSize: 14),
           ),
         ],
       ),
@@ -258,9 +220,8 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
 
   void _handleNotificationTap(NotificationModel notification) {
     _notificationService.markAsRead(notification.id);
-    // Handle notification action here based on actionData
+
     if (notification.actionData != null) {
-      // Navigate or perform action
       print('Action data: ${notification.actionData}');
     }
   }
@@ -270,9 +231,7 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Color(0xff2B2D33),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Clear all notifications?',
           style: TextStyle(
@@ -302,7 +261,10 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text('Clear All', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+            child: Text(
+              'Clear All',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+            ),
           ),
         ],
       ),
@@ -310,7 +272,6 @@ class _NotificationPageState extends State<NotificationPage> with SingleTickerPr
   }
 }
 
-// ==================== NOTIFICATION CARD ====================
 class _NotificationCard extends StatelessWidget {
   final NotificationModel notification;
   final VoidCallback onTap;
@@ -321,36 +282,6 @@ class _NotificationCard extends StatelessWidget {
     required this.onTap,
     required this.onDelete,
   });
-
-  Color _getTypeColor() {
-    switch (notification.type) {
-      case NotificationType.alert:
-        return Colors.red;
-      case NotificationType.warning:
-        return AppColors.warning;
-      case NotificationType.info:
-        return Colors.blueAccent;
-      case NotificationType.success:
-        return AppColors.success;
-      case NotificationType.error:
-        return AppColors.error;
-    }
-  }
-
-  IconData _getTypeIcon() {
-    switch (notification.type) {
-      case NotificationType.alert:
-        return Icons.warning;
-      case NotificationType.warning:
-        return Icons.error_outline;
-      case NotificationType.info:
-        return Icons.info_outline;
-      case NotificationType.success:
-        return Icons.check_circle_outline;
-      case NotificationType.error:
-        return Icons.cancel_outlined;
-    }
-  }
 
   String _getTimeAgo() {
     final now = DateTime.now();
@@ -396,9 +327,9 @@ class _NotificationCard extends StatelessWidget {
             border: notification.isRead
                 ? null
                 : Border.all(
-              color: _getTypeColor().withOpacity(0.4),
-              width: 1.2,
-            ),
+                    color: AppColors.warning.withOpacity(0.4),
+                    width: 1.2,
+                  ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -410,8 +341,8 @@ class _NotificationCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(48),
                 ),
                 child: Icon(
-                  _getTypeIcon(),
-                  color: _getTypeColor(),
+                  Icons.notifications,
+                  color: AppColors.warning,
                   size: 20,
                 ),
               ),
@@ -437,7 +368,7 @@ class _NotificationCard extends StatelessWidget {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: _getTypeColor(),
+                              color: AppColors.warning,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -446,47 +377,14 @@ class _NotificationCard extends StatelessWidget {
                     SizedBox(height: 6),
                     Text(
                       notification.message,
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 13,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 13),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text(
-                          _getTimeAgo(),
-                          style: TextStyle(
-                            color: Color(0xff9E9FA4),
-                            fontSize: 11,
-                          ),
-                        ),
-                        if (notification.priority == NotificationPriority.high ||
-                            notification.priority == NotificationPriority.critical) ...[
-                          SizedBox(width: 8),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: notification.priority == NotificationPriority.critical
-                                  ? Colors.red
-                                  : AppColors.warning,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              notification.priority == NotificationPriority.critical
-                                  ? 'CRITICAL'
-                                  : 'HIGH',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+                    Text(
+                      _getTimeAgo(),
+                      style: TextStyle(color: Color(0xff9E9FA4), fontSize: 11),
                     ),
                   ],
                 ),
@@ -499,52 +397,6 @@ class _NotificationCard extends StatelessWidget {
   }
 }
 
-// ==================== FILTER CHIP ====================
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final Color? color;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _FilterChip({
-    required this.label,
-    this.color,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? (color ?? AppColors.accent).withOpacity(0.15)
-              : Color(0xff2B2D33),
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected
-                ? (color ?? AppColors.accent)
-                : Colors.white.withOpacity(0.15),
-            width: 1.2,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? (color ?? AppColors.accent) : Colors.white70,
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ==================== BADGE WIDGET ====================
 class NotificationBadge extends StatelessWidget {
   final Widget child;
   final int count;
@@ -565,8 +417,8 @@ class NotificationBadge extends StatelessWidget {
         child,
         if (count > 0 || showZero)
           Positioned(
-            right: -6,
-            top: -6,
+            right: 4,
+            top: 0,
             child: Container(
               padding: EdgeInsets.all(count > 9 ? 4 : 5),
               decoration: BoxDecoration(

@@ -281,12 +281,6 @@ class _MultiLineChartState extends State<MultiLineChart>
 
     final live = widget.isLiveMode;
 
-    // Priority:
-    // 1. If not live → HISTORICAL
-    // 2. If live but telemetry == null → DISCONNECTED
-    // 3. If live + paused → PAUSED
-    // 4. Else → LIVE
-
     String statusText;
     Color color;
 
@@ -317,10 +311,7 @@ class _MultiLineChartState extends State<MultiLineChart>
           Container(
             width: 9,
             height: 9,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color,
-            ),
+            decoration: BoxDecoration(shape: BoxShape.circle, color: color),
           ),
           SizedBox(width: 6),
           Icon(

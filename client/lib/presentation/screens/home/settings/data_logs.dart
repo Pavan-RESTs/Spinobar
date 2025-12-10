@@ -374,11 +374,7 @@ class _DataLogsState extends State<DataLogs> {
     return Container(
       margin: EdgeInsets.only(top: 20),
       height: 480,
-      decoration: BoxDecoration(
-        color: Color(0xff141414),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(14)),
       child: MultiLineChart(
         isLiveMode: false,
         staticData: _readings,

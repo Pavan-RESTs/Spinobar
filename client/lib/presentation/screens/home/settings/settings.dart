@@ -29,9 +29,7 @@ class Settings extends StatelessWidget {
     ResetDevice(),
   ];
 
-  List<Widget> nextPagesB2 = [
-    NotificationPage()
-  ];
+  List<Widget> nextPagesB2 = [NotificationPage()];
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +136,11 @@ class Settings extends StatelessWidget {
                 assets: assetsB1,
                 nextPages: nextPagesB1,
               ),
-              SettingsList(options: settingsB2, assets: assetsB2, nextPages: nextPagesB2),
+              SettingsList(
+                options: settingsB2,
+                assets: assetsB2,
+                nextPages: nextPagesB2,
+              ),
               SettingsList(options: settingsB3, assets: assetsB3),
             ],
           ),

@@ -21,6 +21,7 @@ class _SensorThresholdState extends State<SensorThreshold> {
     {'label': 'Shoulder Left  (F2)', 'value': 60, 'unit': 'N'},
     {'label': 'Abdomen (F3)', 'value': 60, 'unit': 'N'},
     {'label': 'Back (F4)', 'value': 60, 'unit': 'N'},
+    {'label': 'Temperature', 'value': 80, 'unit': 'C'},
   ];
 
   List<Map<String, dynamic>> angleValue = [

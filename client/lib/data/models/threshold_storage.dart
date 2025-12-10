@@ -12,14 +12,6 @@ class ThresholdStorage {
   ) async {
     final prefs = await SharedPreferences.getInstance();
 
-    for (var v in values) {
-      if (v['label'] == 'Temperature') {
-        v['value'] = 80;
-        v['unit'] = '°C';
-        v['locked'] = true;
-      }
-    }
-
     await prefs.setString(_sensorKey, jsonEncode(values));
   }
 
@@ -31,14 +23,6 @@ class ThresholdStorage {
     final list = (jsonDecode(data) as List)
         .map((e) => Map<String, dynamic>.from(e))
         .toList();
-
-    for (var v in list) {
-      if (v['label'] == 'Temperature') {
-        v['value'] = 80;
-        v['unit'] = '°C';
-        v['locked'] = true;
-      }
-    }
 
     return list;
   }
@@ -85,8 +69,7 @@ class ThresholdStorage {
         {'label': 'Shoulder Left  (F2)', 'value': 0, 'unit': 'N'},
         {'label': 'Abdomen (F3)', 'value': 0, 'unit': 'N'},
         {'label': 'Back (F4)', 'value': 0, 'unit': 'N'},
-
-        {'label': 'Temperature', 'value': 80, 'unit': '°C', 'locked': true},
+        {'label': 'Temperature', 'value': 80, 'unit': '°C'},
       ]),
     );
 

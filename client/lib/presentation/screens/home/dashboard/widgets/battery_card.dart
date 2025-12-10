@@ -38,12 +38,13 @@ class BatteryCard extends StatelessWidget {
                   Transform.translate(
                     offset: Offset(0, 3),
                     child: Text(
-                      bt != '--'?
-                      '${bt}%': '--',
+                      bt != '--' ? '${bt}%' : '--',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
-                        color: bt!='--'?getBatterColor(bt):AppColors.warning,
+                        color: bt != '--'
+                            ? getBatterColor(bt)
+                            : AppColors.warning,
                       ),
                     ),
                   ),
