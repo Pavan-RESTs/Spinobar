@@ -1,4 +1,3 @@
-
 import 'package:client/data/services/udp_telemetry_service.dart';
 
 class TelemetryRepository {

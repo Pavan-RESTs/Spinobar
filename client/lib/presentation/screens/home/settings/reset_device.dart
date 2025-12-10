@@ -1,11 +1,13 @@
 import 'package:client/core/theme/colors.dart';
 import 'package:client/core/utils/screen_dimension.dart';
+import 'package:client/core/utils/snackbar.dart';
 import 'package:client/presentation/screens/home/settings/widgets/settings_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../data/models/threshold_storage.dart';
 import '../../../../data/providers/threshold_provider.dart';
+import '../../../../data/repositories/sensor_repository.dart';
 
 class ResetDevice extends StatelessWidget {
   const ResetDevice({super.key});
@@ -24,7 +26,7 @@ class ResetDevice extends StatelessWidget {
               Row(
                 children: [
                   Text(
-                    "Erase All Data",
+                    "Reset Data",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -37,9 +39,9 @@ class ResetDevice extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: ScreenDimension.screenWidth*0.5,
+                    width: ScreenDimension.screenWidth * 0.5,
                     child: Text(
-                      "Delete all the sensor and angle data and start a calibration from 0",
+                      "Reset all threshold values to their defaults",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -56,28 +58,66 @@ class ResetDevice extends StatelessWidget {
                         context.read<ThresholdProvider>().load();
                       } catch (_) {}
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("All threshold values reset to 0"),
-                        ),
+                      CustomSnackbar.info(
+                        "All threshold values are reset to 0",
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      minimumSize: Size(ScreenDimension.screenWidth*0.2, 36),
+                      minimumSize: Size(ScreenDimension.screenWidth * 0.2, 36),
                       backgroundColor: AppColors.secondary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                     child: const Text(
-                      'Erase All Data',
+                      'Reset Threshold',
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
+                ],
+              ),
+              SizedBox(height: 24),
+              Row(
+                children: [
+                  Container(
+                    width: ScreenDimension.screenWidth * 0.5,
+                    child: Text(
+                      "Clear the user data history",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final deletedCount = await SensorDatabase.instance
+                          .deleteOldReadings(0);
 
+                      CustomSnackbar.info(
+                        "Patient history cleared successfully",
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(ScreenDimension.screenWidth * 0.2, 36),
+                      backgroundColor: AppColors.secondary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      'Clear History',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],

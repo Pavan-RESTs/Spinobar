@@ -11,6 +11,15 @@ class ThresholdStorage {
     List<Map<String, dynamic>> values,
   ) async {
     final prefs = await SharedPreferences.getInstance();
+
+    for (var v in values) {
+      if (v['label'] == 'Temperature') {
+        v['value'] = 80;
+        v['unit'] = '°C';
+        v['locked'] = true;
+      }
+    }
+
     await prefs.setString(_sensorKey, jsonEncode(values));
   }
 
@@ -18,9 +27,20 @@ class ThresholdStorage {
     final prefs = await SharedPreferences.getInstance();
     String? data = prefs.getString(_sensorKey);
     if (data == null) return null;
-    return (jsonDecode(data) as List)
+
+    final list = (jsonDecode(data) as List)
         .map((e) => Map<String, dynamic>.from(e))
         .toList();
+
+    for (var v in list) {
+      if (v['label'] == 'Temperature') {
+        v['value'] = 80;
+        v['unit'] = '°C';
+        v['locked'] = true;
+      }
+    }
+
+    return list;
   }
 
   static Future<void> saveAngleThreshold(
@@ -34,6 +54,7 @@ class ThresholdStorage {
     final prefs = await SharedPreferences.getInstance();
     String? data = prefs.getString(_angleKey);
     if (data == null) return null;
+
     return (jsonDecode(data) as List)
         .map((e) => Map<String, dynamic>.from(e))
         .toList();
@@ -48,6 +69,7 @@ class ThresholdStorage {
     final prefs = await SharedPreferences.getInstance();
     String? data = prefs.getString(_timeKey);
     if (data == null) return null;
+
     return (jsonDecode(data) as List)
         .map((e) => Map<String, dynamic>.from(e))
         .toList();
@@ -63,6 +85,8 @@ class ThresholdStorage {
         {'label': 'Shoulder Left  (F2)', 'value': 0, 'unit': 'N'},
         {'label': 'Abdomen (F3)', 'value': 0, 'unit': 'N'},
         {'label': 'Back (F4)', 'value': 0, 'unit': 'N'},
+
+        {'label': 'Temperature', 'value': 80, 'unit': '°C', 'locked': true},
       ]),
     );
 

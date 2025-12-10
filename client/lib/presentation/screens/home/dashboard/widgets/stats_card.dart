@@ -10,7 +10,8 @@ class StatsCard extends StatelessWidget {
     Key? key,
     required this.image,
     required this.status,
-    required this.label, required this.labelColor,
+    required this.label,
+    required this.labelColor,
   }) : super(key: key);
 
   @override

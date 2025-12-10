@@ -8,7 +8,7 @@ class UdpTelemetryService {
     _socket = await UDP.bind(Endpoint.any(port: Port(listenPort)));
 
     _socket!.asStream().listen(
-          (datagram) {
+      (datagram) {
         if (datagram == null) return;
         final raw = String.fromCharCodes(datagram.data).trim();
         if (raw.isNotEmpty) onData(raw);

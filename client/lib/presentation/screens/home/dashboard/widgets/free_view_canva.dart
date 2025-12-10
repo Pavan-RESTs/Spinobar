@@ -11,7 +11,7 @@ import '../../../../../core/theme/colors.dart';
 class FreeViewCanva extends StatefulWidget {
   final bool hasAlert;
   final String alertLevel;
-  // Individual sensor statuses
+
   final String f1Status;
   final String f2Status;
   final String f3Status;
@@ -119,6 +119,7 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
       height: 16,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white, width: 0.4),
         color: color,
       ),
     );
@@ -127,7 +128,7 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
   Color _getColorFromStatus(String status) {
     switch (status.toLowerCase()) {
       case "alert":
-        return Colors.red;
+        return AppColors.error;
       case "safe":
         return AppColors.accent;
       default:
@@ -136,12 +137,10 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
   }
 
   Future<void> _updateAllSensorColors() async {
-    // Update each sensor material individually using their indices
-    // F1 is at index 3, F2 at 4, F3 at 5, F4 at 6
-    await changePartColorByIndex(3, _getColorFromStatus(widget.f1Status));
-    await changePartColorByIndex(4, _getColorFromStatus(widget.f2Status));
-    await changePartColorByIndex(5, _getColorFromStatus(widget.f3Status));
-    await changePartColorByIndex(6, _getColorFromStatus(widget.f4Status));
+    await changePartColorByIndex(0, _getColorFromStatus(widget.f1Status));
+    await changePartColorByIndex(1, _getColorFromStatus(widget.f2Status));
+    await changePartColorByIndex(2, _getColorFromStatus(widget.f3Status));
+    await changePartColorByIndex(3, _getColorFromStatus(widget.f4Status));
   }
 
   Future<void> changePartColorByIndex(int materialIndex, Color color) async {
@@ -151,18 +150,15 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
     final g = color.green / 255;
     final b = color.blue / 255;
 
-    final js = """
+    final js =
+        """
       (function(){
         const mv = document.querySelector('model-viewer');
         if (!mv || !mv.model) return;
-        
         const material = mv.model.materials[$materialIndex];
         if (material) {
           material.pbrMetallicRoughness.setBaseColorFactor([$r,$g,$b,1]);
-          console.log('✅ Updated material at index $materialIndex to RGB($r,$g,$b)');
-        } else {
-          console.log('❌ Material at index $materialIndex not found');
-        }
+        } 
       })();
     """;
 

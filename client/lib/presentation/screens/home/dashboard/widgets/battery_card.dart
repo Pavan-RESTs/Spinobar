@@ -1,12 +1,19 @@
+import 'package:client/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../core/constants/image_strings.dart';
-
 
 class BatteryCard extends StatelessWidget {
   const BatteryCard({super.key, required this.bt});
 
   final String bt;
+
+  Color getBatterColor(String btlevel) {
+    int bt = int.tryParse(btlevel) ?? 0;
+    if (bt >= 40) return AppColors.success;
+    if (bt >= 20) return AppColors.warning;
+    return AppColors.error;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,11 +38,12 @@ class BatteryCard extends StatelessWidget {
                   Transform.translate(
                     offset: Offset(0, 3),
                     child: Text(
-                      bt,
+                      bt != '--'?
+                      '${bt}%': '--',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
-                        color: Colors.white,
+                        color: bt!='--'?getBatterColor(bt):AppColors.warning,
                       ),
                     ),
                   ),

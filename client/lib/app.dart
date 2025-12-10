@@ -1,6 +1,7 @@
 import 'package:client/core/utils/screen_dimension.dart';
 import 'package:client/presentation/screens/home/home.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
 import 'data/providers/telemetry_provider.dart';
@@ -33,7 +34,7 @@ class App extends StatelessWidget {
           ScreenDimension.leftSafeArea = MediaQuery.of(context).padding.left;
           ScreenDimension.rightSafeArea = MediaQuery.of(context).padding.right;
 
-          return MaterialApp(
+          return GetMaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData(fontFamily: 'Poppins'),
             home: const HomePage(),

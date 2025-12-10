@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:sqflite/sqflite.dart';
 
 import 'app.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const App());
+  await deleteDatabase(await getDatabasesPath() + '/sensor_data.db');
+  runApp(App());
 }

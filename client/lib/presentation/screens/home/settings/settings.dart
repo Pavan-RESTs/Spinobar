@@ -1,4 +1,5 @@
 import 'package:client/core/constants/image_strings.dart';
+import 'package:client/presentation/screens/home/dashboard/widgets/notification.dart';
 import 'package:client/presentation/screens/home/settings/data_logs.dart';
 import 'package:client/presentation/screens/home/settings/over_wear.dart';
 import 'package:client/presentation/screens/home/settings/reset_device.dart';
@@ -12,12 +13,25 @@ class Settings extends StatelessWidget {
   List<String> settingsB2 = ["Notifications", "Device Info"];
   List<String> settingsB3 = ["Add New Account", "Logout"];
 
-
-  List<String> assetsB1 = [MediaStrings.sensors, MediaStrings.overWear, MediaStrings.dataLogs, MediaStrings.resetData];
+  List<String> assetsB1 = [
+    MediaStrings.sensors,
+    MediaStrings.overWear,
+    MediaStrings.dataLogs,
+    MediaStrings.resetData,
+  ];
   List<String> assetsB2 = [MediaStrings.notifications, MediaStrings.deviceInfo];
   List<String> assetsB3 = [MediaStrings.newAccount, MediaStrings.logout];
 
-  List<Widget> nextPagesB1 = [SensorThreshold(), OverWear(), DataLogs(), ResetDevice()];
+  List<Widget> nextPagesB1 = [
+    SensorThreshold(),
+    OverWear(),
+    DataLogs(),
+    ResetDevice(),
+  ];
+
+  List<Widget> nextPagesB2 = [
+    NotificationPage()
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +133,13 @@ class Settings extends StatelessWidget {
                   ),
                 ],
               ),
-              SettingsList(options: settingsB1, assets: assetsB1, nextPages: nextPagesB1,),
-              SettingsList(options: settingsB2, assets: assetsB2,),
-              SettingsList(options: settingsB3, assets: assetsB3,),
+              SettingsList(
+                options: settingsB1,
+                assets: assetsB1,
+                nextPages: nextPagesB1,
+              ),
+              SettingsList(options: settingsB2, assets: assetsB2, nextPages: nextPagesB2),
+              SettingsList(options: settingsB3, assets: assetsB3),
             ],
           ),
         ),

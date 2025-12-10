@@ -14,6 +14,6 @@ class MediaStrings {
   static const String sensors = 'assets/images/sensors.png';
   static const String spinobarLogo = 'assets/images/spinobar-logo.png';
   static const String wearStatus = 'assets/images/wear-status.png';
-
+  static const String batteryTemp = 'assets/images/battery-temp.png';
   static const String vest = 'assets/models/vest.glb';
 }

@@ -1,4 +1,5 @@
 import 'package:client/core/theme/colors.dart';
+import 'package:client/core/utils/snackbar.dart';
 import 'package:client/presentation/screens/home/settings/widgets/data_update_card.dart';
 import 'package:client/presentation/screens/home/settings/widgets/settings_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,7 @@ class _SensorThresholdState extends State<SensorThreshold> {
                       sensorValues[index]['value'] = newValue;
                     });
                   },
-                  onReset: ()  async {
+                  onReset: () async {
                     setState(() {
                       sensorValues = [
                         {
@@ -87,9 +88,7 @@ class _SensorThresholdState extends State<SensorThreshold> {
                     await context.read<ThresholdProvider>().saveSensors(
                       sensorValues,
                     );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Sensor thresholds saved")),
-                    );
+                    CustomSnackbar.success("Sensor thresholds saved");
                   },
                 ),
 
@@ -116,9 +115,7 @@ class _SensorThresholdState extends State<SensorThreshold> {
                     await context.read<ThresholdProvider>().saveAngle(
                       angleValue,
                     );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Angle threshold saved")),
-                    );
+                    CustomSnackbar.success("Angle threshold saved");
                   },
                 ),
               ],

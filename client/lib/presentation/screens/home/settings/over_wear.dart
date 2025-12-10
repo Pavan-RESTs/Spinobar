@@ -1,4 +1,5 @@
 import 'package:client/core/theme/colors.dart';
+import 'package:client/core/utils/snackbar.dart';
 import 'package:client/presentation/screens/home/settings/widgets/data_update_card.dart';
 import 'package:client/presentation/screens/home/settings/widgets/settings_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class OverWear extends StatefulWidget {
 
 class _OverWearState extends State<OverWear> {
   List<Map<String, dynamic>> entities = [
-    { 'label': 'Time', 'value': 6, 'unit': 'min' }
+    {'label': 'Time', 'value': 6, 'unit': 'min'},
   ];
 
   @override
@@ -56,7 +57,7 @@ class _OverWearState extends State<OverWear> {
                 onReset: () async {
                   setState(() {
                     entities = [
-                      { 'label': 'Time', 'value': 0, 'unit': 'min' }
+                      {'label': 'Time', 'value': 0, 'unit': 'min'},
                     ];
                   });
                   await context.read<ThresholdProvider>().saveTime(entities);
@@ -64,11 +65,8 @@ class _OverWearState extends State<OverWear> {
 
                 onSave: () async {
                   await context.read<ThresholdProvider>().saveTime(entities);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Saved")),
-                  );
+                  CustomSnackbar.success('Saved');
                 },
-
               ),
             ],
           ),

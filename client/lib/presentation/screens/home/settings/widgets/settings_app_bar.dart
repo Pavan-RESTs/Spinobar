@@ -14,7 +14,7 @@ class SettingsAppBar extends StatelessWidget {
           child: Icon(Icons.arrow_back, color: Colors.white),
           onTap: () => NavigationHelper.pop(context),
         ),
-        SizedBox(width: 14,),
+        SizedBox(width: 14),
         Text(
           title,
           style: TextStyle(

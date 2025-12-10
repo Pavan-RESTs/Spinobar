@@ -2,12 +2,16 @@ import 'package:client/core/utils/navigation_helper.dart';
 import 'package:flutter/material.dart';
 
 class SettingsList extends StatelessWidget {
-  const SettingsList({super.key, required this.options, required this.assets, this.nextPages});
+  const SettingsList({
+    super.key,
+    required this.options,
+    required this.assets,
+    this.nextPages,
+  });
 
   final List<String> options;
   final List<String> assets;
   final List<Widget>? nextPages;
-
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +49,6 @@ class SettingsList extends StatelessWidget {
                       child: Center(
                         child: SizedBox(
                           child: Image.asset(assets[i], fit: BoxFit.contain),
-
                         ),
                       ),
                     ),

@@ -27,6 +27,10 @@ dependencies:
   shared_preferences: ^2.5.3
   get: ^4.7.3
   udp: ^5.0.3
+  sqflite: ^2.4.2
+  path_provider: ^2.1.5
+  intl: ^0.20.2
+  share_plus: ^12.0.1
 
 dev_dependencies:
   flutter_test:
