@@ -505,6 +505,8 @@ class _CustomDateTimePickerState extends State<CustomDateTimePicker> {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.dark(
+              secondaryContainer: const Color(0xFF4A90E2).withOpacity(0.2),
+
               primary: AppColors.primary,
               onPrimary: Colors.white,
               surface: const Color(0xff1A1A1A),
@@ -531,7 +533,11 @@ class _CustomDateTimePickerState extends State<CustomDateTimePicker> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(primary: AppColors.primary),
+            colorScheme: ColorScheme.dark(
+              tertiaryContainer: const Color(0xFF4A90E2).withOpacity(0.3),
+              onTertiaryContainer: Colors.white,
+              primary: AppColors.primary,
+            ),
           ),
           child: child!,
         );
@@ -548,7 +554,11 @@ class _CustomDateTimePickerState extends State<CustomDateTimePicker> {
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(primary: AppColors.primary),
+            colorScheme: ColorScheme.dark(
+              tertiaryContainer: const Color(0xFF4A90E2).withOpacity(0.3),
+              onTertiaryContainer: Colors.white,
+              primary: AppColors.primary,
+            ),
           ),
           child: child!,
         );

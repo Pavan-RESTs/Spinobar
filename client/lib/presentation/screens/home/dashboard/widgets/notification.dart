@@ -221,9 +221,7 @@ class _NotificationPageState extends State<NotificationPage>
   void _handleNotificationTap(NotificationModel notification) {
     _notificationService.markAsRead(notification.id);
 
-    if (notification.actionData != null) {
-      print('Action data: ${notification.actionData}');
-    }
+    if (notification.actionData != null) {}
   }
 
   void _showClearAllDialog() {

@@ -164,8 +164,6 @@ class _FreeViewCanvaState extends State<FreeViewCanva> {
 
     try {
       await _controller!.runJavaScript(js);
-    } catch (e) {
-      print('Error updating material $materialIndex: $e');
-    }
+    } catch (e) {}
   }
 }

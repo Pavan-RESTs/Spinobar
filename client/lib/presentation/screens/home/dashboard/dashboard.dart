@@ -75,7 +75,7 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void _checkAlerts(telemetry) {
-    if (thresholds.sensor.length < 4 || thresholds.angle.isEmpty) {
+    if (thresholds.sensor.length < 5 || thresholds.angle.isEmpty) {
       return;
     }
 
@@ -84,17 +84,16 @@ class _DashboardState extends State<Dashboard> {
     final String thF3 = thresholds.sensor[2]['value'].toString();
     final String thF4 = thresholds.sensor[3]['value'].toString();
     final String thTemp = thresholds.sensor[4]['value'].toString();
-
     final String thTA = thresholds.angle[0]['value'].toString();
 
     List<String> alertingSensors = [];
 
     void notifyCategory(
-      String categoryId,
-      String title,
-      String message, {
-      String? actionData,
-    }) {
+        String categoryId,
+        String title,
+        String message, {
+          String? actionData,
+        }) {
       _notifService.addNotification(
         categoryId: categoryId,
         title: title,
@@ -103,7 +102,8 @@ class _DashboardState extends State<Dashboard> {
       );
     }
 
-    if (_isAlert(telemetry.f1, thF1)) {
+    bool f1Alert = _isAlert(telemetry.f1, thF1);
+    if (f1Alert) {
       alertingSensors.add("F1-Right Shoulder");
       notifyCategory(
         'F1',
@@ -112,7 +112,8 @@ class _DashboardState extends State<Dashboard> {
       );
     }
 
-    if (_isAlert(telemetry.f2, thF2)) {
+    bool f2Alert = _isAlert(telemetry.f2, thF2);
+    if (f2Alert) {
       alertingSensors.add("F2-Left Shoulder");
       notifyCategory(
         'F2',
@@ -121,7 +122,8 @@ class _DashboardState extends State<Dashboard> {
       );
     }
 
-    if (_isAlert(telemetry.f3, thF3)) {
+    bool f3Alert = _isAlert(telemetry.f3, thF3);
+    if (f3Alert) {
       alertingSensors.add("F3-Core");
       notifyCategory(
         'F3',
@@ -130,7 +132,8 @@ class _DashboardState extends State<Dashboard> {
       );
     }
 
-    if (_isAlert(telemetry.f4, thF4)) {
+    bool f4Alert = _isAlert(telemetry.f4, thF4);
+    if (f4Alert) {
       alertingSensors.add("F4-Back");
       notifyCategory(
         'F4',
@@ -139,7 +142,8 @@ class _DashboardState extends State<Dashboard> {
       );
     }
 
-    if (_isAlert(telemetry.rf, "60")) {
+    bool rfAlert = _isAlert(telemetry.rf, "60");
+    if (rfAlert) {
       alertingSensors.add("RF-Resultant Force");
       notifyCategory(
         'RF',
@@ -148,7 +152,8 @@ class _DashboardState extends State<Dashboard> {
       );
     }
 
-    if (_isAlert(telemetry.ta, thTA)) {
+    bool taAlert = _isAlert(telemetry.ta, thTA);
+    if (taAlert) {
       alertingSensors.add("TA-Tilt Angle");
       notifyCategory(
         'TA',
@@ -157,7 +162,8 @@ class _DashboardState extends State<Dashboard> {
       );
     }
 
-    if (_isAlert(telemetry.temp, thTemp)) {
+    bool tempAlert = _isAlert(telemetry.temp, thTemp);
+    if (tempAlert) {
       alertingSensors.add("Temperature");
       notifyCategory(
         'TEMP',
@@ -195,8 +201,7 @@ class _DashboardState extends State<Dashboard> {
     }
 
     final thresholds = context.read<ThresholdProvider>();
-    if (thresholds.sensor.length < 4 || thresholds.angle.isEmpty) {
-      debugPrint("⛔ Thresholds not loaded yet — skipping save");
+    if (thresholds.sensor.length < 5 || thresholds.angle.isEmpty) {
       return;
     }
 
@@ -204,6 +209,7 @@ class _DashboardState extends State<Dashboard> {
     String thF2 = thresholds.sensor[1]['value'].toString();
     String thF3 = thresholds.sensor[2]['value'].toString();
     String thF4 = thresholds.sensor[3]['value'].toString();
+    String thTemp = thresholds.sensor[4]['value'].toString();
     String thTA = thresholds.angle[0]['value'].toString();
 
     List<String> alertingSensors = [];
@@ -214,13 +220,12 @@ class _DashboardState extends State<Dashboard> {
     if (_isAlert(telemetry.f4, thF4)) alertingSensors.add('F4-Back');
     if (_isAlert(telemetry.rf, "60")) alertingSensors.add('RF-Resultant Force');
     if (_isAlert(telemetry.ta, thTA)) alertingSensors.add('TA-Tilt Angle');
-
-    final tempValue = double.tryParse(telemetry.temp ?? '0') ?? 0;
-    if (tempValue > 0) alertingSensors.add('Temperature');
+    if (_isAlert(telemetry.temp, thTemp)) alertingSensors.add('Temperature');
 
     final batteryLevel = int.tryParse(telemetry.bt ?? "0") ?? 0;
-    if (batteryLevel > 0 && batteryLevel < 20)
+    if (batteryLevel > 0 && batteryLevel < 20) {
       alertingSensors.add('Battery Level');
+    }
 
     bool hasAlert = alertingSensors.isNotEmpty;
 
@@ -231,6 +236,7 @@ class _DashboardState extends State<Dashboard> {
       thF3: thF3,
       thF4: thF4,
       thTA: thTA,
+      thTemp: thTemp,
     );
 
     try {
@@ -247,9 +253,7 @@ class _DashboardState extends State<Dashboard> {
         alertLevel: alertLevel,
       );
       _lastSaveTime = DateTime.now();
-    } catch (e) {
-      debugPrint("Error saving sensor data: $e");
-    }
+    } catch (e) {}
   }
 
   bool _isAlert(String? value, String threshold) {
@@ -266,6 +270,7 @@ class _DashboardState extends State<Dashboard> {
     required String thF3,
     required String thF4,
     required String thTA,
+    required String thTemp,
   }) {
     List<bool> alerts = [
       _isAlert(telemetry.f1, thF1),
@@ -274,6 +279,7 @@ class _DashboardState extends State<Dashboard> {
       _isAlert(telemetry.f4, thF4),
       _isAlert(telemetry.rf, "60"),
       _isAlert(telemetry.ta, thTA),
+      _isAlert(telemetry.temp, thTemp),
     ];
 
     int alertCount = alerts.where((a) => a).length;
@@ -307,6 +313,9 @@ class _DashboardState extends State<Dashboard> {
     String thF4 = thresholds.sensor.isNotEmpty
         ? thresholds.sensor[3]['value'].toString()
         : "0";
+    String thTemp = thresholds.sensor.length > 4
+        ? thresholds.sensor[4]['value'].toString()
+        : "80";
     String thTA = thresholds.angle.isNotEmpty
         ? thresholds.angle[0]['value'].toString()
         : "0";
@@ -323,6 +332,7 @@ class _DashboardState extends State<Dashboard> {
         statusFromThreshold(telemetry.f4, thF4),
         statusFromThreshold(telemetry.rf, "60"),
         statusFromThreshold(telemetry.ta, thTA),
+        statusFromThreshold(telemetry.temp, thTemp),
       ];
 
       int alertCount = statuses.where((s) => s == "Alert").length;
@@ -339,7 +349,8 @@ class _DashboardState extends State<Dashboard> {
           statusFromThreshold(telemetry.f3, thF3) == "Alert" ||
           statusFromThreshold(telemetry.f4, thF4) == "Alert" ||
           statusFromThreshold(telemetry.rf, "60") == "Alert" ||
-          statusFromThreshold(telemetry.ta, thTA) == "Alert";
+          statusFromThreshold(telemetry.ta, thTA) == "Alert" ||
+          statusFromThreshold(telemetry.temp, thTemp) == "Alert";
     }
 
     return SafeArea(
@@ -477,8 +488,8 @@ class _DashboardState extends State<Dashboard> {
                             label: "Battery Temperature",
                             labelColor: telemetry == null
                                 ? AppColors.warning
-                                : (int.tryParse(telemetry.temp ?? '0') ?? 0) >
-                                      80
+                                : (double.tryParse(telemetry.temp ?? '0') ?? 0) >
+                                double.parse(thTemp)
                                 ? AppColors.error
                                 : AppColors.accent,
                           ),
@@ -547,6 +558,7 @@ class _DashboardState extends State<Dashboard> {
                                   },
                                 ],
                               ),
+                              const SizedBox(height: 14),
                             ],
                           ),
                         ),

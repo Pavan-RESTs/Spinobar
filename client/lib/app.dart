@@ -35,7 +35,6 @@ class App extends StatelessWidget {
           ScreenDimension.rightSafeArea = MediaQuery.of(context).padding.right;
 
           return GetMaterialApp(
-            debugShowCheckedModeBanner: false,
             theme: ThemeData(fontFamily: 'Poppins'),
             home: const HomePage(),
           );

@@ -11,6 +11,32 @@ class ThresholdProvider extends ChangeNotifier {
     sensor = await ThresholdStorage.loadSensorThresholds() ?? [];
     angle = await ThresholdStorage.loadAngleThreshold() ?? [];
     overwear = await ThresholdStorage.loadOverWearTime() ?? [];
+
+    if (sensor.isEmpty) {
+      sensor = [
+        {'label': 'Shoulder Right (F1)', 'value': 0, 'unit': 'N'},
+        {'label': 'Shoulder Left  (F2)', 'value': 0, 'unit': 'N'},
+        {'label': 'Abdomen (F3)', 'value': 0, 'unit': 'N'},
+        {'label': 'Back (F4)', 'value': 0, 'unit': 'N'},
+        {'label': 'Temperature', 'value': 80, 'unit': '°C'},
+      ];
+      await ThresholdStorage.saveSensorThresholds(sensor);
+    }
+
+    if (angle.isEmpty) {
+      angle = [
+        {'label': 'Tilt Angle', 'value': 0, 'unit': 'Deg'},
+      ];
+      await ThresholdStorage.saveAngleThreshold(angle);
+    }
+
+    if (overwear.isEmpty) {
+      overwear = [
+        {'label': 'Time', 'value': 0, 'unit': 'min'},
+      ];
+      await ThresholdStorage.saveOverWearTime(overwear);
+    }
+
     notifyListeners();
   }
 
