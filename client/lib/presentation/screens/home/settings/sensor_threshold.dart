@@ -32,7 +32,8 @@ class _SensorThresholdState extends State<SensorThreshold> {
     final savedTemperature = await ThresholdStorage.loadTemperatureThreshold();
 
     setState(() {
-      sensorValues = savedSensors ??
+      sensorValues =
+          savedSensors ??
           [
             {'label': 'Shoulder Right (F1)', 'min': 30, 'max': 60, 'unit': 'N'},
             {'label': 'Shoulder Left (F2)', 'min': 30, 'max': 60, 'unit': 'N'},
@@ -40,12 +41,14 @@ class _SensorThresholdState extends State<SensorThreshold> {
             {'label': 'Back (F4)', 'min': 30, 'max': 60, 'unit': 'N'},
           ];
 
-      temperatureValue = savedTemperature ??
+      temperatureValue =
+          savedTemperature ??
           [
             {'label': 'Temperature', 'value': 80, 'unit': '°C'},
           ];
 
-      angleValue = savedAngle ??
+      angleValue =
+          savedAngle ??
           [
             {'label': 'Tilt Angle', 'value': 60, 'unit': 'Deg'},
           ];
@@ -66,7 +69,6 @@ class _SensorThresholdState extends State<SensorThreshold> {
               children: [
                 const SettingsAppBar(title: "Sensor Threshold"),
 
-                // -------------------- SENSOR VALUES ---------------------
                 DataUpdateCard(
                   entities: sensorValues,
                   label: "Sensor Values:",
@@ -83,10 +85,30 @@ class _SensorThresholdState extends State<SensorThreshold> {
                   onReset: () async {
                     setState(() {
                       sensorValues = [
-                        {'label': 'Shoulder Right (F1)', 'min': 0, 'max': 100, 'unit': 'N'},
-                        {'label': 'Shoulder Left (F2)', 'min': 0, 'max': 100, 'unit': 'N'},
-                        {'label': 'Abdomen (F3)', 'min': 0, 'max': 100, 'unit': 'N'},
-                        {'label': 'Back (F4)', 'min': 0, 'max': 100, 'unit': 'N'},
+                        {
+                          'label': 'Shoulder Right (F1)',
+                          'min': 0,
+                          'max': 100,
+                          'unit': 'N',
+                        },
+                        {
+                          'label': 'Shoulder Left (F2)',
+                          'min': 0,
+                          'max': 100,
+                          'unit': 'N',
+                        },
+                        {
+                          'label': 'Abdomen (F3)',
+                          'min': 0,
+                          'max': 100,
+                          'unit': 'N',
+                        },
+                        {
+                          'label': 'Back (F4)',
+                          'min': 0,
+                          'max': 100,
+                          'unit': 'N',
+                        },
                       ];
                     });
                     await provider.saveSensors(sensorValues);
@@ -98,7 +120,6 @@ class _SensorThresholdState extends State<SensorThreshold> {
                   },
                 ),
 
-                // -------------------- TEMPERATURE ---------------------
                 DataUpdateCard(
                   entities: temperatureValue,
                   label: "Temperature:",
@@ -127,7 +148,6 @@ class _SensorThresholdState extends State<SensorThreshold> {
                   },
                 ),
 
-                // -------------------- ANGLE ---------------------
                 DataUpdateCard(
                   entities: angleValue,
                   label: "Angle:",

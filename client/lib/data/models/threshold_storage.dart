@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThresholdStorage {
-  // Keys
   static const _sensorKey = "sensor_thresholds";
   static const _sensorUpdatedKey = "sensor_updated_at";
 
@@ -16,8 +15,9 @@ class ThresholdStorage {
   static const _timeKey = "overwear_time";
   static const _timeUpdatedKey = "overwear_time_updated_at";
 
-  // ---------------- SENSOR ----------------
-  static Future<void> saveSensorThresholds(List<Map<String, dynamic>> values) async {
+  static Future<void> saveSensorThresholds(
+    List<Map<String, dynamic>> values,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_sensorKey, jsonEncode(values));
     await prefs.setString(_sensorUpdatedKey, DateTime.now().toIso8601String());
@@ -39,11 +39,15 @@ class ThresholdStorage {
     return ts != null ? DateTime.parse(ts) : null;
   }
 
-  // ---------------- TEMPERATURE ----------------
-  static Future<void> saveTemperatureThreshold(List<Map<String, dynamic>> value) async {
+  static Future<void> saveTemperatureThreshold(
+    List<Map<String, dynamic>> value,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_temperatureKey, jsonEncode(value));
-    await prefs.setString(_temperatureUpdatedKey, DateTime.now().toIso8601String());
+    await prefs.setString(
+      _temperatureUpdatedKey,
+      DateTime.now().toIso8601String(),
+    );
   }
 
   static Future<List<Map<String, dynamic>>?> loadTemperatureThreshold() async {
@@ -62,8 +66,9 @@ class ThresholdStorage {
     return ts != null ? DateTime.parse(ts) : null;
   }
 
-  // ---------------- ANGLE ----------------
-  static Future<void> saveAngleThreshold(List<Map<String, dynamic>> value) async {
+  static Future<void> saveAngleThreshold(
+    List<Map<String, dynamic>> value,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_angleKey, jsonEncode(value));
     await prefs.setString(_angleUpdatedKey, DateTime.now().toIso8601String());
@@ -85,7 +90,6 @@ class ThresholdStorage {
     return ts != null ? DateTime.parse(ts) : null;
   }
 
-  // ---------------- OVERWEAR TIME ----------------
   static Future<void> saveOverWearTime(List<Map<String, dynamic>> value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_timeKey, jsonEncode(value));
@@ -108,7 +112,6 @@ class ThresholdStorage {
     return ts != null ? DateTime.parse(ts) : null;
   }
 
-  // ---------------- RESET EVERYTHING ----------------
   static Future<void> resetAllThresholds() async {
     final prefs = await SharedPreferences.getInstance();
     final now = DateTime.now().toIso8601String();

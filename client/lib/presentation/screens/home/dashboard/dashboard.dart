@@ -14,10 +14,13 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/constants/image_strings.dart';
+import '../../../../data/providers/connection_provider.dart';
 import '../../../../data/providers/telemetry_provider.dart';
 import '../../../../data/providers/threshold_provider.dart';
+import '../../../../data/providers/timer_provider.dart';
 import '../../../../data/services/notification_service.dart';
 import '../../../../data/services/sensor_db_service.dart';
+import '../../../../data/services/telemetry_service.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -27,6 +30,10 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  late final connectionProvider = context.watch<ConnectionProvider>();
+  late bool isConnected = connectionProvider.isConnected;
+  final TelemetryService _telemetryService = TelemetryService();
+
   final NotificationService _notifService = NotificationService();
   final SensorDataService _dataService = SensorDataService();
   late ThresholdProvider thresholds;
@@ -45,13 +52,14 @@ class _DashboardState extends State<Dashboard> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider = context.read<TelemetryProvider>();
       thresholds = context.read<ThresholdProvider>();
-
       _telemetryListener = () {
+        if (isConnected) return;
         final telemetry = provider.telemetry;
         if (telemetry != null) {
           _checkAlerts(telemetry);
         }
       };
+
       provider.addListener(_telemetryListener!);
     });
   }
@@ -472,8 +480,52 @@ class _DashboardState extends State<Dashboard> {
                             },
                           ),
                         ),
-                        const SizedBox(width: 20),
-                        const Icon(Icons.more_vert, color: Colors.white),
+                        IconButton(
+                          onPressed: () async {
+                            final telemetryProvider = context
+                                .read<TelemetryProvider>();
+                            final timerProvider = context
+                                .read<OverWearTimerProvider>();
+                            final connectionProvider = context
+                                .read<ConnectionProvider>();
+
+                            if (connectionProvider.isConnected) {
+                              telemetryProvider.stopUdpListening();
+                              timerProvider.stop();
+
+                              connectionProvider.setConnected(false);
+
+                              NotificationService().addNotification(
+                                categoryId: "DISCONNECT",
+                                title: "Device Disconnected",
+                                message: "UDP telemetry stream stopped.",
+                              );
+                            } else {
+                              await telemetryProvider.startUdpListening();
+                              timerProvider.start();
+
+                              connectionProvider.setConnected(true);
+
+                              NotificationService().addNotification(
+                                categoryId: "CONNECT",
+                                title: "Device Connected",
+                                message: "UDP telemetry stream started.",
+                              );
+                            }
+                          },
+                          icon: Icon(
+                            connectionProvider.isConnected
+                                ? Icons.wifi
+                                : Icons.wifi_off,
+                            color: connectionProvider.isConnected
+                                ? AppColors.accent
+                                : AppColors.error,
+                            size: 30,
+                          ),
+                          tooltip: connectionProvider.isConnected
+                              ? "Disconnect"
+                              : "Connect",
+                        ),
                       ],
                     ),
                   ],

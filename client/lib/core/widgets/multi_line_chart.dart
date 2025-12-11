@@ -82,7 +82,7 @@ class _MultiLineChartState extends State<MultiLineChart>
 
     if (widget.isLiveMode) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Provider.of<TelemetryProvider>(context, listen: false).init();
+        Provider.of<TelemetryProvider>(context, listen: false);
       });
     } else {
       _loadStaticData();

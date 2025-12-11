@@ -3,33 +3,57 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/telemetry_model.dart';
-import '../repositories/telemetry_repository.dart';
+import '../services/udp_telemetry_service.dart';
 
 class TelemetryProvider extends ChangeNotifier {
-  final TelemetryRepository _repo = TelemetryRepository();
+  final UdpTelemetryService _udp = UdpTelemetryService();
   TelemetryModel? telemetry;
 
   Timer? _timeoutTimer;
-  static const Duration timeoutDuration = Duration(seconds: 3);
+  static const Duration timeoutDuration = Duration(seconds: 10);
 
-  void init() {
-    _repo.startListening((raw) {
-      telemetry = TelemetryModel.fromRaw(raw);
+  bool _isListening = false;
+
+  bool get isConnected => telemetry != null && _isListening;
+  bool get isListening => _isListening;
+
+  Future<void> startUdpListening() async {
+    if (_isListening) return;
+
+    _isListening = true;
+
+    await _udp.listen((raw) {
+      _handleIncoming(raw);
+    });
+
+    notifyListeners();
+  }
+
+  void stopUdpListening() {
+    if (!_isListening) return;
+
+    _isListening = false;
+    _udp.dispose();
+
+    telemetry = null;
+    notifyListeners();
+  }
+
+  void _handleIncoming(String raw) {
+    telemetry = TelemetryModel.fromRaw(raw);
+    notifyListeners();
+
+    _timeoutTimer?.cancel();
+    _timeoutTimer = Timer(timeoutDuration, () {
+      telemetry = null;
       notifyListeners();
-      _timeoutTimer?.cancel();
-      _timeoutTimer = Timer(timeoutDuration, () {
-        telemetry = null;
-        notifyListeners();
-      });
     });
   }
 
-  bool get isConnected => telemetry != null;
-
   @override
   void dispose() {
+    stopUdpListening();
     _timeoutTimer?.cancel();
-    _repo.dispose();
     super.dispose();
   }
 }

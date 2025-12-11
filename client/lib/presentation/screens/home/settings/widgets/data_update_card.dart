@@ -33,7 +33,6 @@ class DataUpdateCard extends StatefulWidget {
 }
 
 class _DataUpdateCardState extends State<DataUpdateCard> {
-  // Format "Last updated" text
   String _formatTime(DateTime? time) {
     if (time == null) return "Never";
 
@@ -53,7 +52,6 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Card title
           Text(
             widget.label,
             style: const TextStyle(
@@ -63,7 +61,6 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
             ),
           ),
 
-          // Last updated text
           Text(
             "Last updated ${_formatTime(widget.lastUpdated)}",
             style: const TextStyle(color: Color(0xff515151), fontSize: 14),
@@ -78,7 +75,6 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
             ),
             child: Column(
               children: [
-                // List of sliders
                 for (int i = 0; i < widget.entities.length; i++)
                   Container(
                     margin: const EdgeInsets.only(bottom: 24),
@@ -87,15 +83,16 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
 
                 const SizedBox(height: 8),
 
-                // Buttons Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // RESET BUTTON
                     ElevatedButton(
                       onPressed: widget.onReset,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(ScreenDimension.screenWidth * 0.35, 36),
+                        minimumSize: Size(
+                          ScreenDimension.screenWidth * 0.35,
+                          36,
+                        ),
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -110,11 +107,13 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
                       ),
                     ),
 
-                    // SAVE BUTTON
                     ElevatedButton(
                       onPressed: widget.onSave,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(ScreenDimension.screenWidth * 0.35, 36),
+                        minimumSize: Size(
+                          ScreenDimension.screenWidth * 0.35,
+                          36,
+                        ),
                         backgroundColor: AppColors.secondary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -129,7 +128,7 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
@@ -142,7 +141,6 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Label + current values
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -177,7 +175,6 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
     );
   }
 
-  // SINGLE VALUE SLIDER
   Widget _buildSingleSlider(int index) {
     return SliderTheme(
       data: SliderThemeData(
@@ -199,7 +196,6 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
     );
   }
 
-  // RANGE SLIDER
   Widget _buildRangeSlider(int index) {
     return SliderTheme(
       data: SliderThemeData(
@@ -209,7 +205,9 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
         overlayColor: AppColors.secondary.withOpacity(0.2),
         trackHeight: 4,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-        rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 8),
+        rangeThumbShape: const RoundRangeSliderThumbShape(
+          enabledThumbRadius: 8,
+        ),
       ),
       child: RangeSlider(
         values: RangeValues(

@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
+import 'data/providers/connection_provider.dart';
 import 'data/providers/telemetry_provider.dart';
 import 'data/providers/threshold_provider.dart';
+import 'data/providers/timer_provider.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -17,11 +19,14 @@ class App extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) {
             final provider = TelemetryProvider();
-            provider.init();
+            provider;
             return provider;
           },
         ),
+        ChangeNotifierProvider(create: (_) => OverWearTimerProvider()),
+
         ChangeNotifierProvider(create: (_) => ThresholdProvider()..load()),
+        ChangeNotifierProvider(create: (_) => ConnectionProvider()),
       ],
       child: Builder(
         builder: (context) {
@@ -35,6 +40,7 @@ class App extends StatelessWidget {
           ScreenDimension.rightSafeArea = MediaQuery.of(context).padding.right;
 
           return GetMaterialApp(
+            debugShowCheckedModeBanner: false,
             theme: ThemeData(fontFamily: 'Poppins'),
             home: const HomePage(),
           );
