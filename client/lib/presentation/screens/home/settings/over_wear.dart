@@ -28,13 +28,18 @@ class _OverWearState extends State<OverWear> {
 
   void _load() async {
     final saved = await ThresholdStorage.loadOverWearTime();
-    if (saved != null) {
-      setState(() => entities = saved);
-    }
+    setState(() {
+      entities = saved ??
+          [
+            {'label': 'Time', 'value': 6, 'unit': 'min'},
+          ];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<ThresholdProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: Padding(
@@ -43,10 +48,15 @@ class _OverWearState extends State<OverWear> {
           child: Column(
             children: [
               const SettingsAppBar(title: "Over Wear"),
+
               DataUpdateCard(
                 entities: entities,
                 label: "Set Time:",
-                lastUpdated: "5 days",
+                lastUpdated: provider.overwearUpdatedAt,   // << UPDATED
+
+                isRangeSlider: false,
+                minLimit: 0,
+                maxLimit: 300, // 5 hours max or adjust as needed
 
                 onValueChanged: (index, newValue) {
                   setState(() {
@@ -60,12 +70,14 @@ class _OverWearState extends State<OverWear> {
                       {'label': 'Time', 'value': 0, 'unit': 'min'},
                     ];
                   });
-                  await context.read<ThresholdProvider>().saveTime(entities);
+
+                  await provider.saveTime(entities);
+                  CustomSnackbar.info("Over-wear time reset");
                 },
 
                 onSave: () async {
-                  await context.read<ThresholdProvider>().saveTime(entities);
-                  CustomSnackbar.success('Saved');
+                  await provider.saveTime(entities);
+                  CustomSnackbar.success('Over-wear time saved');
                 },
               ),
             ],

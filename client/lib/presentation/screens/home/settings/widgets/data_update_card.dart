@@ -19,7 +19,7 @@ class DataUpdateCard extends StatefulWidget {
 
   final List<Map<String, dynamic>> entities;
   final String label;
-  final String lastUpdated;
+  final DateTime? lastUpdated;
   final bool isRangeSlider;
   final double minLimit;
   final double maxLimit;
@@ -33,6 +33,18 @@ class DataUpdateCard extends StatefulWidget {
 }
 
 class _DataUpdateCardState extends State<DataUpdateCard> {
+  // Format "Last updated" text
+  String _formatTime(DateTime? time) {
+    if (time == null) return "Never";
+
+    final diff = DateTime.now().difference(time);
+
+    if (diff.inMinutes < 1) return "Just now";
+    if (diff.inMinutes < 60) return "${diff.inMinutes} min ago";
+    if (diff.inHours < 24) return "${diff.inHours} hrs ago";
+    return "${diff.inDays} days ago";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -41,6 +53,7 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Card title
           Text(
             widget.label,
             style: const TextStyle(
@@ -49,13 +62,15 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
               fontSize: 16,
             ),
           ),
+
+          // Last updated text
           Text(
-            "Last update ${widget.lastUpdated} ago",
+            "Last updated ${_formatTime(widget.lastUpdated)}",
             style: const TextStyle(color: Color(0xff515151), fontSize: 14),
           ),
+
           Container(
             margin: const EdgeInsets.only(top: 24),
-            width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: const Color(0xff2C2D33),
@@ -63,53 +78,24 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
             ),
             child: Column(
               children: [
+                // List of sliders
                 for (int i = 0; i < widget.entities.length; i++)
                   Container(
                     margin: const EdgeInsets.only(bottom: 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              widget.entities[i]['label'],
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              widget.isRangeSlider
-                                  ? "${widget.entities[i]['min']} - ${widget.entities[i]['max']} ${widget.entities[i]['unit']}"
-                                  : "${widget.entities[i]['value']} ${widget.entities[i]['unit']}",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        widget.isRangeSlider
-                            ? _buildRangeSlider(i)
-                            : _buildSingleSlider(i),
-                      ],
-                    ),
+                    child: _buildSliderSection(i),
                   ),
+
                 const SizedBox(height: 8),
+
+                // Buttons Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    // RESET BUTTON
                     ElevatedButton(
                       onPressed: widget.onReset,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(
-                          ScreenDimension.screenWidth * 0.35,
-                          36,
-                        ),
+                        minimumSize: Size(ScreenDimension.screenWidth * 0.35, 36),
                         backgroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -123,13 +109,12 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
                         ),
                       ),
                     ),
+
+                    // SAVE BUTTON
                     ElevatedButton(
                       onPressed: widget.onSave,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: Size(
-                          ScreenDimension.screenWidth * 0.35,
-                          36,
-                        ),
+                        minimumSize: Size(ScreenDimension.screenWidth * 0.35, 36),
                         backgroundColor: AppColors.secondary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -144,7 +129,7 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
                       ),
                     ),
                   ],
-                ),
+                )
               ],
             ),
           ),
@@ -153,6 +138,46 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
     );
   }
 
+  Widget _buildSliderSection(int index) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Label + current values
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              widget.entities[index]['label'],
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+              ),
+            ),
+
+            Text(
+              widget.isRangeSlider
+                  ? "${widget.entities[index]['min']} - ${widget.entities[index]['max']} ${widget.entities[index]['unit']}"
+                  : "${widget.entities[index]['value']} ${widget.entities[index]['unit']}",
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        widget.isRangeSlider
+            ? _buildRangeSlider(index)
+            : _buildSingleSlider(index),
+      ],
+    );
+  }
+
+  // SINGLE VALUE SLIDER
   Widget _buildSingleSlider(int index) {
     return SliderTheme(
       data: SliderThemeData(
@@ -174,6 +199,7 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
     );
   }
 
+  // RANGE SLIDER
   Widget _buildRangeSlider(int index) {
     return SliderTheme(
       data: SliderThemeData(
@@ -183,9 +209,7 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
         overlayColor: AppColors.secondary.withOpacity(0.2),
         trackHeight: 4,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-        rangeThumbShape: const RoundRangeSliderThumbShape(
-          enabledThumbRadius: 8,
-        ),
+        rangeThumbShape: const RoundRangeSliderThumbShape(enabledThumbRadius: 8),
       ),
       child: RangeSlider(
         values: RangeValues(

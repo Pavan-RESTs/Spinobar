@@ -8,12 +8,23 @@ class ThresholdProvider extends ChangeNotifier {
   List<Map<String, dynamic>> angle = [];
   List<Map<String, dynamic>> overwear = [];
 
+  DateTime? sensorUpdatedAt;
+  DateTime? temperatureUpdatedAt;
+  DateTime? angleUpdatedAt;
+  DateTime? overwearUpdatedAt;
+
   Future<void> load() async {
     sensor = await ThresholdStorage.loadSensorThresholds() ?? [];
     temperature = await ThresholdStorage.loadTemperatureThreshold() ?? [];
     angle = await ThresholdStorage.loadAngleThreshold() ?? [];
     overwear = await ThresholdStorage.loadOverWearTime() ?? [];
 
+    sensorUpdatedAt = await ThresholdStorage.loadSensorUpdatedTime();
+    temperatureUpdatedAt = await ThresholdStorage.loadTemperatureUpdatedTime();
+    angleUpdatedAt = await ThresholdStorage.loadAngleUpdatedTime();
+    overwearUpdatedAt = await ThresholdStorage.loadOverWearUpdatedTime();
+
+    // Initialize defaults if empty
     if (sensor.isEmpty) {
       sensor = [
         {'label': 'Shoulder Right (F1)', 'min': 30, 'max': 60, 'unit': 'N'},
@@ -25,23 +36,17 @@ class ThresholdProvider extends ChangeNotifier {
     }
 
     if (temperature.isEmpty) {
-      temperature = [
-        {'label': 'Temperature', 'value': 80, 'unit': 'C'},
-      ];
+      temperature = [{'label': 'Temperature', 'value': 80, 'unit': 'C'}];
       await ThresholdStorage.saveTemperatureThreshold(temperature);
     }
 
     if (angle.isEmpty) {
-      angle = [
-        {'label': 'Tilt Angle', 'value': 60, 'unit': 'Deg'},
-      ];
+      angle = [{'label': 'Tilt Angle', 'value': 60, 'unit': 'Deg'}];
       await ThresholdStorage.saveAngleThreshold(angle);
     }
 
     if (overwear.isEmpty) {
-      overwear = [
-        {'label': 'Time', 'value': 0, 'unit': 'min'},
-      ];
+      overwear = [{'label': 'Time', 'value': 0, 'unit': 'min'}];
       await ThresholdStorage.saveOverWearTime(overwear);
     }
 
