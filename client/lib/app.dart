@@ -14,14 +14,14 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThresholdProvider()),
         ChangeNotifierProvider(
-          create: (_) {
-            final provider = TelemetryProvider();
-            provider.init();
-            return provider;
+          create: (ctx) {
+            final tp = TelemetryProvider(ctx.read<ThresholdProvider>());
+            tp.init();  // <-- start listening ONCE globally
+            return tp;
           },
         ),
-        ChangeNotifierProvider(create: (_) => ThresholdProvider()..load()),
       ],
       child: Builder(
         builder: (context) {
