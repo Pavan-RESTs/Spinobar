@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../../../../core/theme/colors.dart';
 import '../../../../../core/utils/screen_dimension.dart';
@@ -15,13 +12,19 @@ class DataUpdateCard extends StatefulWidget {
     required this.onValueChanged,
     required this.onSave,
     required this.onReset,
+    this.isRangeSlider = false,
+    this.minLimit = 0,
+    this.maxLimit = 100,
   });
 
   final List<Map<String, dynamic>> entities;
   final String label;
   final String lastUpdated;
+  final bool isRangeSlider;
+  final double minLimit;
+  final double maxLimit;
 
-  final void Function(int index, int newValue) onValueChanged;
+  final void Function(int index, dynamic newValue) onValueChanged;
   final VoidCallback onSave;
   final VoidCallback onReset;
 
@@ -30,32 +33,6 @@ class DataUpdateCard extends StatefulWidget {
 }
 
 class _DataUpdateCardState extends State<DataUpdateCard> {
-  Timer? _holdTimer;
-
-  void _triggerChange(int index, int delta) {
-    int current = widget.entities[index]['value'];
-    if (current + delta >= 0) {
-      widget.onValueChanged(index, current + delta);
-    }
-  }
-
-  void _startHold(int index, int delta) {
-    _holdTimer?.cancel();
-    _holdTimer = Timer.periodic(const Duration(milliseconds: 120), (timer) {
-      _triggerChange(index, delta);
-    });
-  }
-
-  void _stopHold() {
-    _holdTimer?.cancel();
-  }
-
-  @override
-  void dispose() {
-    _holdTimer?.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -88,90 +65,41 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
               children: [
                 for (int i = 0; i < widget.entities.length; i++)
                   Container(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    margin: const EdgeInsets.only(bottom: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          widget.entities[i]['label'],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                          ),
-                        ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xff42464F),
-                                borderRadius: BorderRadius.circular(40),
-                              ),
-                              padding: const EdgeInsets.all(4),
-                              child: Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () => _triggerChange(i, -1),
-                                    onLongPressStart: (_) => _startHold(i, -1),
-                                    onLongPressEnd: (_) => _stopHold(),
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(38),
-                                        ),
-                                        color: Colors.white,
-                                      ),
-                                      child: const Icon(Iconsax.minus_copy),
-                                    ),
-                                  ),
-
-                                  Container(
-                                    width: 50,
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      widget.entities[i]['value'].toString(),
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-
-                                  GestureDetector(
-                                    onTap: () => _triggerChange(i, 1),
-                                    onLongPressStart: (_) => _startHold(i, 1),
-                                    onLongPressEnd: (_) => _stopHold(),
-                                    child: Container(
-                                      width: 30,
-                                      height: 30,
-                                      decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(38),
-                                        ),
-                                        color: Colors.white,
-                                      ),
-                                      child: const Icon(Iconsax.add_copy),
-                                    ),
-                                  ),
-                                ],
+                            Text(
+                              widget.entities[i]['label'],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
                               ),
                             ),
-                            const SizedBox(width: 8),
                             Text(
-                              widget.entities[i]['unit'],
+                              widget.isRangeSlider
+                                  ? "${widget.entities[i]['min']} - ${widget.entities[i]['max']} ${widget.entities[i]['unit']}"
+                                  : "${widget.entities[i]['value']} ${widget.entities[i]['unit']}",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
                         ),
+                        const SizedBox(height: 12),
+                        widget.isRangeSlider
+                            ? _buildRangeSlider(i)
+                            : _buildSingleSlider(i),
                       ],
                     ),
                   ),
-
+                const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -221,6 +149,57 @@ class _DataUpdateCardState extends State<DataUpdateCard> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSingleSlider(int index) {
+    return SliderTheme(
+      data: SliderThemeData(
+        activeTrackColor: AppColors.secondary,
+        inactiveTrackColor: const Color(0xff42464F),
+        thumbColor: Colors.white,
+        overlayColor: AppColors.secondary.withOpacity(0.2),
+        trackHeight: 4,
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+      ),
+      child: Slider(
+        value: widget.entities[index]['value'].toDouble(),
+        min: widget.minLimit,
+        max: widget.maxLimit,
+        onChanged: (value) {
+          widget.onValueChanged(index, value.round());
+        },
+      ),
+    );
+  }
+
+  Widget _buildRangeSlider(int index) {
+    return SliderTheme(
+      data: SliderThemeData(
+        activeTrackColor: AppColors.secondary,
+        inactiveTrackColor: const Color(0xff42464F),
+        thumbColor: Colors.white,
+        overlayColor: AppColors.secondary.withOpacity(0.2),
+        trackHeight: 4,
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+        rangeThumbShape: const RoundRangeSliderThumbShape(
+          enabledThumbRadius: 8,
+        ),
+      ),
+      child: RangeSlider(
+        values: RangeValues(
+          widget.entities[index]['min'].toDouble(),
+          widget.entities[index]['max'].toDouble(),
+        ),
+        min: widget.minLimit,
+        max: widget.maxLimit,
+        onChanged: (values) {
+          widget.onValueChanged(index, {
+            'min': values.start.round(),
+            'max': values.end.round(),
+          });
+        },
       ),
     );
   }

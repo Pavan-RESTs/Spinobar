@@ -17,10 +17,13 @@ class SensorThreshold extends StatefulWidget {
 
 class _SensorThresholdState extends State<SensorThreshold> {
   List<Map<String, dynamic>> sensorValues = [
-    {'label': 'Shoulder Right (F1)', 'value': 60, 'unit': 'N'},
-    {'label': 'Shoulder Left  (F2)', 'value': 60, 'unit': 'N'},
-    {'label': 'Abdomen (F3)', 'value': 60, 'unit': 'N'},
-    {'label': 'Back (F4)', 'value': 60, 'unit': 'N'},
+    {'label': 'Shoulder Right (F1)', 'min': 30, 'max': 60, 'unit': 'N'},
+    {'label': 'Shoulder Left  (F2)', 'min': 30, 'max': 60, 'unit': 'N'},
+    {'label': 'Abdomen (F3)', 'min': 30, 'max': 60, 'unit': 'N'},
+    {'label': 'Back (F4)', 'min': 30, 'max': 60, 'unit': 'N'},
+  ];
+
+  List<Map<String, dynamic>> temperatureValue = [
     {'label': 'Temperature', 'value': 80, 'unit': 'C'},
   ];
 
@@ -37,9 +40,12 @@ class _SensorThresholdState extends State<SensorThreshold> {
   void _loadValues() async {
     final savedSensors = await ThresholdStorage.loadSensorThresholds();
     final savedAngle = await ThresholdStorage.loadAngleThreshold();
+    final savedTemperature = await ThresholdStorage.loadTemperatureThreshold();
+
     setState(() {
       if (savedSensors != null) sensorValues = savedSensors;
       if (savedAngle != null) angleValue = savedAngle;
+      if (savedTemperature != null) temperatureValue = savedTemperature;
     });
   }
 
@@ -59,9 +65,13 @@ class _SensorThresholdState extends State<SensorThreshold> {
                   entities: sensorValues,
                   label: "Sensor Values:",
                   lastUpdated: "2 Days",
+                  isRangeSlider: true,
+                  minLimit: 0,
+                  maxLimit: 255,
                   onValueChanged: (index, newValue) {
                     setState(() {
-                      sensorValues[index]['value'] = newValue;
+                      sensorValues[index]['min'] = newValue['min'];
+                      sensorValues[index]['max'] = newValue['max'];
                     });
                   },
                   onReset: () async {
@@ -69,21 +79,34 @@ class _SensorThresholdState extends State<SensorThreshold> {
                       sensorValues = [
                         {
                           'label': 'Shoulder Right (F1)',
-                          'value': 0,
+                          'min': 0,
+                          'max': 100,
                           'unit': 'N',
                         },
                         {
                           'label': 'Shoulder Left  (F2)',
-                          'value': 0,
+                          'min': 0,
+                          'max': 100,
                           'unit': 'N',
                         },
-                        {'label': 'Abdomen (F3)', 'value': 0, 'unit': 'N'},
-                        {'label': 'Back (F4)', 'value': 0, 'unit': 'N'},
+                        {
+                          'label': 'Abdomen (F3)',
+                          'min': 0,
+                          'max': 100,
+                          'unit': 'N',
+                        },
+                        {
+                          'label': 'Back (F4)',
+                          'min': 0,
+                          'max': 100,
+                          'unit': 'N',
+                        },
                       ];
                     });
                     await context.read<ThresholdProvider>().saveSensors(
                       sensorValues,
                     );
+                    CustomSnackbar.info("Sensor threshold reset");
                   },
                   onSave: () async {
                     await context.read<ThresholdProvider>().saveSensors(
@@ -94,9 +117,45 @@ class _SensorThresholdState extends State<SensorThreshold> {
                 ),
 
                 DataUpdateCard(
+                  entities: temperatureValue,
+                  label: "Temperature:",
+                  lastUpdated: "2 Days",
+                  isRangeSlider: false,
+                  minLimit: 0,
+                  maxLimit: 100,
+                  onValueChanged: (index, newValue) {
+                    setState(() {
+                      temperatureValue[index]['value'] = newValue;
+                    });
+                  },
+                  onReset: () async {
+                    setState(() {
+                      temperatureValue = [
+                        {'label': 'Temperature', 'value': 0, 'unit': 'C'},
+                      ];
+                    });
+
+                    await context.read<ThresholdProvider>().saveTemperature(
+                      temperatureValue,
+                    );
+                    CustomSnackbar.info("Temperature threshold reset");
+                  },
+
+                  onSave: () async {
+                    await context.read<ThresholdProvider>().saveTemperature(
+                      temperatureValue,
+                    );
+                    CustomSnackbar.success("Temperature threshold saved");
+                  },
+                ),
+
+                DataUpdateCard(
                   entities: angleValue,
                   label: "Angle:",
                   lastUpdated: "3 days",
+                  isRangeSlider: false,
+                  minLimit: 0,
+                  maxLimit: 90,
                   onValueChanged: (index, newValue) {
                     setState(() {
                       angleValue[index]['value'] = newValue;
@@ -111,6 +170,7 @@ class _SensorThresholdState extends State<SensorThreshold> {
                     await context.read<ThresholdProvider>().saveAngle(
                       angleValue,
                     );
+                    CustomSnackbar.info("Angle threshold reset");
                   },
                   onSave: () async {
                     await context.read<ThresholdProvider>().saveAngle(

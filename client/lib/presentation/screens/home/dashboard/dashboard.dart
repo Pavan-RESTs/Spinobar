@@ -75,25 +75,31 @@ class _DashboardState extends State<Dashboard> {
   }
 
   void _checkAlerts(telemetry) {
-    if (thresholds.sensor.length < 5 || thresholds.angle.isEmpty) {
+    if (thresholds.sensor.length < 4 ||
+        thresholds.temperature.isEmpty ||
+        thresholds.angle.isEmpty) {
       return;
     }
 
-    final String thF1 = thresholds.sensor[0]['value'].toString();
-    final String thF2 = thresholds.sensor[1]['value'].toString();
-    final String thF3 = thresholds.sensor[2]['value'].toString();
-    final String thF4 = thresholds.sensor[3]['value'].toString();
-    final String thTemp = thresholds.sensor[4]['value'].toString();
+    final String thF1Min = thresholds.sensor[0]['min'].toString();
+    final String thF1Max = thresholds.sensor[0]['max'].toString();
+    final String thF2Min = thresholds.sensor[1]['min'].toString();
+    final String thF2Max = thresholds.sensor[1]['max'].toString();
+    final String thF3Min = thresholds.sensor[2]['min'].toString();
+    final String thF3Max = thresholds.sensor[2]['max'].toString();
+    final String thF4Min = thresholds.sensor[3]['min'].toString();
+    final String thF4Max = thresholds.sensor[3]['max'].toString();
+    final String thTemp = thresholds.temperature[0]['value'].toString();
     final String thTA = thresholds.angle[0]['value'].toString();
 
     List<String> alertingSensors = [];
 
     void notifyCategory(
-        String categoryId,
-        String title,
-        String message, {
-          String? actionData,
-        }) {
+      String categoryId,
+      String title,
+      String message, {
+      String? actionData,
+    }) {
       _notifService.addNotification(
         categoryId: categoryId,
         title: title,
@@ -102,43 +108,43 @@ class _DashboardState extends State<Dashboard> {
       );
     }
 
-    bool f1Alert = _isAlert(telemetry.f1, thF1);
+    bool f1Alert = _isRangeAlert(telemetry.f1, thF1Min, thF1Max);
     if (f1Alert) {
       alertingSensors.add("F1-Right Shoulder");
       notifyCategory(
         'F1',
-        "High Pressure - Right Shoulder",
-        "Sensor F1 exceeded threshold ($thF1).",
+        "Pressure Out of Range - Right Shoulder",
+        "Sensor F1 outside threshold range ($thF1Min-$thF1Max).",
       );
     }
 
-    bool f2Alert = _isAlert(telemetry.f2, thF2);
+    bool f2Alert = _isRangeAlert(telemetry.f2, thF2Min, thF2Max);
     if (f2Alert) {
       alertingSensors.add("F2-Left Shoulder");
       notifyCategory(
         'F2',
-        "High Pressure - Left Shoulder",
-        "Sensor F2 exceeded threshold ($thF2).",
+        "Pressure Out of Range - Left Shoulder",
+        "Sensor F2 outside threshold range ($thF2Min-$thF2Max).",
       );
     }
 
-    bool f3Alert = _isAlert(telemetry.f3, thF3);
+    bool f3Alert = _isRangeAlert(telemetry.f3, thF3Min, thF3Max);
     if (f3Alert) {
       alertingSensors.add("F3-Core");
       notifyCategory(
         'F3',
-        "High Pressure - Core",
-        "Sensor F3 exceeded threshold ($thF3).",
+        "Pressure Out of Range - Core",
+        "Sensor F3 outside threshold range ($thF3Min-$thF3Max).",
       );
     }
 
-    bool f4Alert = _isAlert(telemetry.f4, thF4);
+    bool f4Alert = _isRangeAlert(telemetry.f4, thF4Min, thF4Max);
     if (f4Alert) {
       alertingSensors.add("F4-Back");
       notifyCategory(
         'F4',
-        "High Pressure - Back",
-        "Sensor F4 exceeded threshold ($thF4).",
+        "Pressure Out of Range - Back",
+        "Sensor F4 outside threshold range ($thF4Min-$thF4Max).",
       );
     }
 
@@ -201,23 +207,33 @@ class _DashboardState extends State<Dashboard> {
     }
 
     final thresholds = context.read<ThresholdProvider>();
-    if (thresholds.sensor.length < 5 || thresholds.angle.isEmpty) {
+    if (thresholds.sensor.length < 4 ||
+        thresholds.temperature.isEmpty ||
+        thresholds.angle.isEmpty) {
       return;
     }
 
-    String thF1 = thresholds.sensor[0]['value'].toString();
-    String thF2 = thresholds.sensor[1]['value'].toString();
-    String thF3 = thresholds.sensor[2]['value'].toString();
-    String thF4 = thresholds.sensor[3]['value'].toString();
-    String thTemp = thresholds.sensor[4]['value'].toString();
+    String thF1Min = thresholds.sensor[0]['min'].toString();
+    String thF1Max = thresholds.sensor[0]['max'].toString();
+    String thF2Min = thresholds.sensor[1]['min'].toString();
+    String thF2Max = thresholds.sensor[1]['max'].toString();
+    String thF3Min = thresholds.sensor[2]['min'].toString();
+    String thF3Max = thresholds.sensor[2]['max'].toString();
+    String thF4Min = thresholds.sensor[3]['min'].toString();
+    String thF4Max = thresholds.sensor[3]['max'].toString();
+    String thTemp = thresholds.temperature[0]['value'].toString();
     String thTA = thresholds.angle[0]['value'].toString();
 
     List<String> alertingSensors = [];
 
-    if (_isAlert(telemetry.f1, thF1)) alertingSensors.add('F1-Right Shoulder');
-    if (_isAlert(telemetry.f2, thF2)) alertingSensors.add('F2-Left Shoulder');
-    if (_isAlert(telemetry.f3, thF3)) alertingSensors.add('F3-Core');
-    if (_isAlert(telemetry.f4, thF4)) alertingSensors.add('F4-Back');
+    if (_isRangeAlert(telemetry.f1, thF1Min, thF1Max))
+      alertingSensors.add('F1-Right Shoulder');
+    if (_isRangeAlert(telemetry.f2, thF2Min, thF2Max))
+      alertingSensors.add('F2-Left Shoulder');
+    if (_isRangeAlert(telemetry.f3, thF3Min, thF3Max))
+      alertingSensors.add('F3-Core');
+    if (_isRangeAlert(telemetry.f4, thF4Min, thF4Max))
+      alertingSensors.add('F4-Back');
     if (_isAlert(telemetry.rf, "60")) alertingSensors.add('RF-Resultant Force');
     if (_isAlert(telemetry.ta, thTA)) alertingSensors.add('TA-Tilt Angle');
     if (_isAlert(telemetry.temp, thTemp)) alertingSensors.add('Temperature');
@@ -231,10 +247,14 @@ class _DashboardState extends State<Dashboard> {
 
     String alertLevel = _calculateAlertLevel(
       telemetry: telemetry,
-      thF1: thF1,
-      thF2: thF2,
-      thF3: thF3,
-      thF4: thF4,
+      thF1Min: thF1Min,
+      thF1Max: thF1Max,
+      thF2Min: thF2Min,
+      thF2Max: thF2Max,
+      thF3Min: thF3Min,
+      thF3Max: thF3Max,
+      thF4Min: thF4Min,
+      thF4Max: thF4Max,
       thTA: thTA,
       thTemp: thTemp,
     );
@@ -256,6 +276,14 @@ class _DashboardState extends State<Dashboard> {
     } catch (e) {}
   }
 
+  bool _isRangeAlert(String? value, String minThreshold, String maxThreshold) {
+    if (value == null) return false;
+    double tv = double.tryParse(value) ?? 0;
+    double min = double.tryParse(minThreshold) ?? 0;
+    double max = double.tryParse(maxThreshold) ?? 100;
+    return tv < min || tv > max;
+  }
+
   bool _isAlert(String? value, String threshold) {
     if (value == null) return false;
     double tv = double.tryParse(value) ?? 0;
@@ -265,18 +293,22 @@ class _DashboardState extends State<Dashboard> {
 
   String _calculateAlertLevel({
     required telemetry,
-    required String thF1,
-    required String thF2,
-    required String thF3,
-    required String thF4,
+    required String thF1Min,
+    required String thF1Max,
+    required String thF2Min,
+    required String thF2Max,
+    required String thF3Min,
+    required String thF3Max,
+    required String thF4Min,
+    required String thF4Max,
     required String thTA,
     required String thTemp,
   }) {
     List<bool> alerts = [
-      _isAlert(telemetry.f1, thF1),
-      _isAlert(telemetry.f2, thF2),
-      _isAlert(telemetry.f3, thF3),
-      _isAlert(telemetry.f4, thF4),
+      _isRangeAlert(telemetry.f1, thF1Min, thF1Max),
+      _isRangeAlert(telemetry.f2, thF2Min, thF2Max),
+      _isRangeAlert(telemetry.f3, thF3Min, thF3Max),
+      _isRangeAlert(telemetry.f4, thF4Min, thF4Max),
       _isAlert(telemetry.rf, "60"),
       _isAlert(telemetry.ta, thTA),
       _isAlert(telemetry.temp, thTemp),
@@ -291,6 +323,21 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+    String statusFromRangeThreshold(
+      String? telemetryValue,
+      String? minThreshold,
+      String? maxThreshold,
+    ) {
+      if (telemetryValue == null ||
+          minThreshold == null ||
+          maxThreshold == null)
+        return "--";
+      double tv = double.tryParse(telemetryValue) ?? 0;
+      double min = double.tryParse(minThreshold) ?? 0;
+      double max = double.tryParse(maxThreshold) ?? 100;
+      return (tv < min || tv > max) ? "Alert" : "Safe";
+    }
+
     String statusFromThreshold(String? telemetryValue, String? thresholdValue) {
       if (telemetryValue == null || thresholdValue == null) return "--";
       double tv = double.tryParse(telemetryValue) ?? 0;
@@ -301,20 +348,32 @@ class _DashboardState extends State<Dashboard> {
     final thresholds = context.watch<ThresholdProvider>();
     final telemetry = context.watch<TelemetryProvider>().telemetry;
 
-    String thF1 = thresholds.sensor.isNotEmpty
-        ? thresholds.sensor[0]['value'].toString()
+    String thF1Min = thresholds.sensor.isNotEmpty
+        ? thresholds.sensor[0]['min'].toString()
         : "0";
-    String thF2 = thresholds.sensor.isNotEmpty
-        ? thresholds.sensor[1]['value'].toString()
+    String thF1Max = thresholds.sensor.isNotEmpty
+        ? thresholds.sensor[0]['max'].toString()
+        : "100";
+    String thF2Min = thresholds.sensor.length > 1
+        ? thresholds.sensor[1]['min'].toString()
         : "0";
-    String thF3 = thresholds.sensor.isNotEmpty
-        ? thresholds.sensor[2]['value'].toString()
+    String thF2Max = thresholds.sensor.length > 1
+        ? thresholds.sensor[1]['max'].toString()
+        : "100";
+    String thF3Min = thresholds.sensor.length > 2
+        ? thresholds.sensor[2]['min'].toString()
         : "0";
-    String thF4 = thresholds.sensor.isNotEmpty
-        ? thresholds.sensor[3]['value'].toString()
+    String thF3Max = thresholds.sensor.length > 2
+        ? thresholds.sensor[2]['max'].toString()
+        : "100";
+    String thF4Min = thresholds.sensor.length > 3
+        ? thresholds.sensor[3]['min'].toString()
         : "0";
-    String thTemp = thresholds.sensor.length > 4
-        ? thresholds.sensor[4]['value'].toString()
+    String thF4Max = thresholds.sensor.length > 3
+        ? thresholds.sensor[3]['max'].toString()
+        : "100";
+    String thTemp = thresholds.temperature.isNotEmpty
+        ? thresholds.temperature[0]['value'].toString()
         : "80";
     String thTA = thresholds.angle.isNotEmpty
         ? thresholds.angle[0]['value'].toString()
@@ -326,10 +385,10 @@ class _DashboardState extends State<Dashboard> {
       if (telemetry == null) return "warning";
 
       List<String> statuses = [
-        statusFromThreshold(telemetry.f1, thF1),
-        statusFromThreshold(telemetry.f2, thF2),
-        statusFromThreshold(telemetry.f3, thF3),
-        statusFromThreshold(telemetry.f4, thF4),
+        statusFromRangeThreshold(telemetry.f1, thF1Min, thF1Max),
+        statusFromRangeThreshold(telemetry.f2, thF2Min, thF2Max),
+        statusFromRangeThreshold(telemetry.f3, thF3Min, thF3Max),
+        statusFromRangeThreshold(telemetry.f4, thF4Min, thF4Max),
         statusFromThreshold(telemetry.rf, "60"),
         statusFromThreshold(telemetry.ta, thTA),
         statusFromThreshold(telemetry.temp, thTemp),
@@ -344,10 +403,11 @@ class _DashboardState extends State<Dashboard> {
 
     bool hasAnyAlert() {
       if (telemetry == null) return false;
-      return statusFromThreshold(telemetry.f1, thF1) == "Alert" ||
-          statusFromThreshold(telemetry.f2, thF2) == "Alert" ||
-          statusFromThreshold(telemetry.f3, thF3) == "Alert" ||
-          statusFromThreshold(telemetry.f4, thF4) == "Alert" ||
+      return statusFromRangeThreshold(telemetry.f1, thF1Min, thF1Max) ==
+              "Alert" ||
+          statusFromRangeThreshold(telemetry.f2, thF2Min, thF2Max) == "Alert" ||
+          statusFromRangeThreshold(telemetry.f3, thF3Min, thF3Max) == "Alert" ||
+          statusFromRangeThreshold(telemetry.f4, thF4Min, thF4Max) == "Alert" ||
           statusFromThreshold(telemetry.rf, "60") == "Alert" ||
           statusFromThreshold(telemetry.ta, thTA) == "Alert" ||
           statusFromThreshold(telemetry.temp, thTemp) == "Alert";
@@ -435,10 +495,26 @@ class _DashboardState extends State<Dashboard> {
               child: FreeViewCanva(
                 hasAlert: hasAnyAlert(),
                 alertLevel: calculateAlertLevel(),
-                f1Status: statusFromThreshold(telemetry?.f1, thF1),
-                f2Status: statusFromThreshold(telemetry?.f2, thF2),
-                f3Status: statusFromThreshold(telemetry?.f3, thF3),
-                f4Status: statusFromThreshold(telemetry?.f4, thF4),
+                f1Status: statusFromRangeThreshold(
+                  telemetry?.f1,
+                  thF1Min,
+                  thF1Max,
+                ),
+                f2Status: statusFromRangeThreshold(
+                  telemetry?.f2,
+                  thF2Min,
+                  thF2Max,
+                ),
+                f3Status: statusFromRangeThreshold(
+                  telemetry?.f3,
+                  thF3Min,
+                  thF3Max,
+                ),
+                f4Status: statusFromRangeThreshold(
+                  telemetry?.f4,
+                  thF4Min,
+                  thF4Max,
+                ),
               ),
             ),
 
@@ -488,8 +564,9 @@ class _DashboardState extends State<Dashboard> {
                             label: "Battery Temperature",
                             labelColor: telemetry == null
                                 ? AppColors.warning
-                                : (double.tryParse(telemetry.temp ?? '0') ?? 0) >
-                                double.parse(thTemp)
+                                : (double.tryParse(telemetry.temp ?? '0') ??
+                                          0) >
+                                      double.parse(thTemp)
                                 ? AppColors.error
                                 : AppColors.accent,
                           ),
@@ -522,9 +599,10 @@ class _DashboardState extends State<Dashboard> {
                                 parts: [
                                   {
                                     'name': 'Back',
-                                    'status': statusFromThreshold(
+                                    'status': statusFromRangeThreshold(
                                       telemetry?.f4,
-                                      thF4,
+                                      thF4Min,
+                                      thF4Max,
                                     ),
                                     'value': showValue(telemetry?.f4),
                                   },
@@ -571,17 +649,19 @@ class _DashboardState extends State<Dashboard> {
                                 parts: [
                                   {
                                     'name': 'Right',
-                                    'status': statusFromThreshold(
+                                    'status': statusFromRangeThreshold(
                                       telemetry?.f1,
-                                      thF1,
+                                      thF1Min,
+                                      thF1Max,
                                     ),
                                     'value': showValue(telemetry?.f1),
                                   },
                                   {
                                     'name': 'Left',
-                                    'status': statusFromThreshold(
+                                    'status': statusFromRangeThreshold(
                                       telemetry?.f2,
-                                      thF2,
+                                      thF2Min,
+                                      thF2Max,
                                     ),
                                     'value': showValue(telemetry?.f2),
                                   },
@@ -593,9 +673,10 @@ class _DashboardState extends State<Dashboard> {
                                 parts: [
                                   {
                                     'name': 'Core',
-                                    'status': statusFromThreshold(
+                                    'status': statusFromRangeThreshold(
                                       telemetry?.f3,
-                                      thF3,
+                                      thF3Min,
+                                      thF3Max,
                                     ),
                                     'value': showValue(telemetry?.f3),
                                   },
